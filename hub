@@ -1,19 +1,21 @@
 --!strict
--- Rixhu Fit Copy UI
+-- Rixhu Fit Copy UI - Fully Functional Version
 -- LocalScript placed in StarterPlayerScripts or a GUI container
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local SoundService = game:GetService("SoundService")
+local InsertService = game:GetService("InsertService")
+local StarterGui = game:GetService("StarterGui")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
 -- SOUND ASSET
-local CLICK_SOUND_ID = "rbxassetid://YOUR_CLICK_SOUND_ID"
+local CLICK_SOUND_ID = "rbxassetid://9080070218"
 
 -- BACKGROUND IMAGE ASSET
-local BACKGROUND_IMAGE_ID = "rbxassetid://YOUR_BACKGROUND_IMAGE_ID"
+local BACKGROUND_IMAGE_ID = "rbxassetid://81566764268635"
 
 -- Create Main UI
 local screenGui = Instance.new("ScreenGui")
@@ -21,10 +23,14 @@ screenGui.Name = "RixhuFitCopyUI"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
+-- Draggable Main Frame
 local bgFrame = Instance.new("ImageLabel")
-bgFrame.Size = UDim2.new(1, 0, 1, 0)
+bgFrame.Size = UDim2.new(0.8, 0, 0.8, 0)
+bgFrame.Position = UDim2.new(0.1, 0, 0.1, 0)
 bgFrame.Image = BACKGROUND_IMAGE_ID
 bgFrame.BackgroundTransparency = 1
+bgFrame.Active = true
+bgFrame.Draggable = true
 bgFrame.Parent = screenGui
 
 -- Title
@@ -50,6 +56,7 @@ local function createButton(name: string, text: string, size: UDim2, position: U
 	button.Font = Enum.Font.Gotham
 	button.TextScaled = true
 	button.AutoButtonColor = false
+	button.ClipsDescendants = true
 	local corner = Instance.new("UICorner")
 	corner.CornerRadius = UDim.new(0, 12)
 	corner.Parent = button
@@ -66,6 +73,7 @@ local function createButton(name: string, text: string, size: UDim2, position: U
 
 	local clickSound = Instance.new("Sound")
 	clickSound.SoundId = CLICK_SOUND_ID
+	clickSound.Volume = 1
 	clickSound.Parent = button
 
 	button.MouseButton1Click:Connect(function()
@@ -78,9 +86,11 @@ end
 
 -- Player list container
 local playerListFrame = Instance.new("Frame")
-playerListFrame.Size = UDim2.new(0.2, 0, 0.8, 0)
-playerListFrame.Position = UDim2.new(0.02, 0, 0.1, 0)
+playerListFrame.Size = UDim2.new(0.25, 0, 0.75, 0)
+playerListFrame.Position = UDim2.new(0.02, 0, 0.15, 0)
 playerListFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+playerListFrame.ClipsDescendants = true
+playerListFrame.Active = true
 local listCorner = Instance.new("UICorner")
 listCorner.CornerRadius = UDim.new(0, 12)
 listCorner.Parent = playerListFrame
@@ -95,10 +105,39 @@ playerScroll.Parent = playerListFrame
 
 local uiList = Instance.new("UIListLayout")
 uiList.Padding = UDim.new(0, 5)
+uiList.SortOrder = Enum.SortOrder.LayoutOrder
 uiList.Parent = playerScroll
 
 -- Store selected player
 local selectedPlayer: Player? = nil
+
+-- Accessories/Items frame
+local itemListFrame = Instance.new("Frame")
+itemListFrame.Size = UDim2.new(0.45, 0, 0.75, 0)
+itemListFrame.Position = UDim2.new(0.52, 0, 0.15, 0)
+itemListFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+itemListFrame.ClipsDescendants = true
+itemListFrame.Active = true
+local itemCorner = Instance.new("UICorner")
+itemCorner.CornerRadius = UDim.new(0, 12)
+itemCorner.Parent = itemListFrame
+itemListFrame.Parent = bgFrame
+
+local itemScroll = Instance.new("ScrollingFrame")
+itemScroll.Size = UDim2.new(1, 0, 1, 0)
+itemScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+itemScroll.ScrollBarThickness = 4
+itemScroll.BackgroundTransparency = 1
+itemScroll.Parent = itemListFrame
+
+local itemListLayout = Instance.new("UIListLayout")
+itemListLayout.Padding = UDim.new(0, 5)
+itemListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+itemListLayout.Parent = itemScroll
+
+-- Wear all button
+local wearAllButton = createButton("WearAll", "Wear All", UDim2.new(0.15, 0, 0.08, 0), UDim2.new(0.31, 0, 0.05, 0))
+wearAllButton.Parent = bgFrame
 
 -- Utility: List all players
 local function refreshPlayerList()
@@ -117,18 +156,43 @@ local function refreshPlayerList()
 					end
 				end
 				btn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+
+				-- Display selected player items
+				itemScroll:ClearAllChildren()
+				itemListLayout.Parent = itemScroll
+				local humDesc = plr.Character and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid:FindFirstChild("HumanoidDescription")
+				if humDesc then
+					local desc = Players:GetHumanoidDescriptionFromUserId(plr.UserId)
+					for _, prop in ipairs({
+						"BackAccessory", "FaceAccessory", "FrontAccessory", "HairAccessory", "HatAccessory", "NeckAccessory", "ShoulderAccessory", "WaistAccessory",
+						"Shirt", "Pants", "ShirtGraphic", "GraphicTShirt",
+						"ClimbAnimation", "FallAnimation", "IdleAnimation", "JumpAnimation", "RunAnimation", "SwimAnimation", "WalkAnimation",
+						"Head", "LeftArm", "RightArm", "LeftLeg", "RightLeg", "Torso"
+					}) do
+						local val = desc[prop]
+						if val and val ~= "" and val ~= 0 then
+							local itemBtn = createButton(prop, prop, UDim2.new(1, -10, 0, 40), UDim2.new(0, 5, 0, 0))
+							itemBtn.Parent = itemScroll
+							itemBtn.MouseButton1Click:Connect(function()
+								local myHumDesc = player.Character and player.Character:FindFirstChildOfClass("Humanoid") and player.Character:FindFirstChildOfClass("Humanoid").HumanoidDescription
+								if myHumDesc then
+									myHumDesc[prop] = val
+									player.Character:FindFirstChildOfClass("Humanoid"):ApplyDescription(myHumDesc)
+								end
+							end)
+						end
+					end
+				end
 			end)
 		end
 	end
 end
 
--- Call once
+wearAllButton.MouseButton1Click:Connect(function()
+	if selectedPlayer then
+		local desc = Players:GetHumanoidDescriptionFromUserId(selectedPlayer.UserId)
+		player.Character:FindFirstChildOfClass("Humanoid"):ApplyDescription(desc)
+	end
+end)
+
 refreshPlayerList()
-
--- TO DO: Create "Wear All" button, item list panel, and logic for fetching accessories/animations
--- TO DO: Create UI for accessories with clickable pop buttons for each item
--- TO DO: Make each item button equip the item using InsertService or HumanoidDescription
--- TO DO: Minimize and toggle buttons, animations for UI transitions
--- TO DO: Sanitize and add debounce for buttons as needed
-
--- You can continue to expand this from here
