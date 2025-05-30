@@ -1,28 +1,29 @@
--- Rixhu Fit Copy - Vertical Layout UI with Minimize and Proper Player Detection
--- Place this script in StarterPlayerScripts or StarterGui
+--!strict
+-- Rixhu Fit Copy - Fully Working Vertical UI with Player Detection and Minimize Functionality
+-- Place this LocalScript in StarterPlayerScripts
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 
-local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
+local localPlayer = Players.LocalPlayer
+local playerGui = localPlayer:WaitForChild("PlayerGui")
 
--- SOUND ASSET AND BACKGROUND IMAGE (replace these)
-local CLICK_SOUND_ID = "rbxassetid://YOUR_CLICK_SOUND_ID"
-local BACKGROUND_IMAGE_ID = "rbxassetid://YOUR_BACKGROUND_IMAGE_ID"
+-- Replace with your own asset IDs
+local CLICK_SOUND_ID = "rbxassetid://9080070218"
+local BACKGROUND_IMAGE_ID = "rbxassetid://81566764268635"
 
--- Main ScreenGui
+-- Create ScreenGui
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "RixhuFitUI"
 screenGui.ResetOnSpawn = false
 screenGui.IgnoreGuiInset = true
 screenGui.Parent = playerGui
 
--- Master container (Frame)
+-- Create Main Frame
 local mainFrame = Instance.new("ImageLabel")
-mainFrame.Size = UDim2.new(0.3, 0, 0.95, 0)
-mainFrame.Position = UDim2.new(0.01, 0, 0.025, 0)
+mainFrame.Size = UDim2.new(0.3, 0, 0.9, 0)
+mainFrame.Position = UDim2.new(0.01, 0, 0.05, 0)
 mainFrame.Image = BACKGROUND_IMAGE_ID
 mainFrame.ScaleType = Enum.ScaleType.Stretch
 mainFrame.BackgroundTransparency = 1
@@ -31,15 +32,14 @@ mainFrame.Active = true
 mainFrame.Draggable = true
 mainFrame.Parent = screenGui
 
--- Corner
-local uiCorner = Instance.new("UICorner")
-uiCorner.CornerRadius = UDim.new(0, 16)
-uiCorner.Parent = mainFrame
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 16)
+mainCorner.Parent = mainFrame
 
--- Title Label
+-- Title
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(0.9, 0, 0.08, 0)
-title.Position = UDim2.new(0.05, 0, 0, 0)
+title.Size = UDim2.new(1, -30, 0.08, 0)
+title.Position = UDim2.new(0.015, 0, 0, 0)
 title.BackgroundTransparency = 1
 title.Text = "Rixhu Fit Copy"
 title.TextColor3 = Color3.new(1, 1, 1)
@@ -48,10 +48,10 @@ title.TextScaled = true
 title.Name = "Title"
 title.Parent = mainFrame
 
--- Minimize button (top-right corner, small)
+-- Minimize Button
 local minimizeBtn = Instance.new("TextButton")
 minimizeBtn.Size = UDim2.new(0, 24, 0, 24)
-minimizeBtn.Position = UDim2.new(1, -30, 0, 6)
+minimizeBtn.Position = UDim2.new(1, -28, 0, 4)
 minimizeBtn.BackgroundColor3 = Color3.new(0, 0, 0)
 minimizeBtn.Text = "_"
 minimizeBtn.TextColor3 = Color3.new(1, 1, 1)
@@ -63,18 +63,18 @@ local btnCorner = Instance.new("UICorner")
 btnCorner.CornerRadius = UDim.new(1, 0)
 btnCorner.Parent = minimizeBtn
 
--- Toggle visibility
+-- Toggle Minimize
 local isMinimized = false
 minimizeBtn.MouseButton1Click:Connect(function()
 	isMinimized = not isMinimized
 	for _, child in ipairs(mainFrame:GetChildren()) do
-		if child.Name ~= "MinimizeBtn" then
+		if child ~= minimizeBtn then
 			child.Visible = not isMinimized
 		end
 	end
 end)
 
--- Player List Section
+-- Players Label
 local playerListLabel = Instance.new("TextLabel")
 playerListLabel.Size = UDim2.new(1, 0, 0.05, 0)
 playerListLabel.Position = UDim2.new(0, 0, 0.1, 0)
@@ -83,26 +83,37 @@ playerListLabel.Text = "Players"
 playerListLabel.TextColor3 = Color3.new(1, 1, 1)
 playerListLabel.Font = Enum.Font.Gotham
 playerListLabel.TextScaled = true
+playerListLabel.Name = "PlayerListLabel"
 playerListLabel.Parent = mainFrame
 
+-- Scrollable Player List
 local playerScroll = Instance.new("ScrollingFrame")
-playerScroll.Size = UDim2.new(0.95, 0, 0.4, 0)
+playerScroll.Size = UDim2.new(0.95, 0, 0.8, 0)
 playerScroll.Position = UDim2.new(0.025, 0, 0.15, 0)
 playerScroll.BackgroundColor3 = Color3.new(0, 0, 0)
 playerScroll.ScrollBarThickness = 6
 playerScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
 playerScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+playerScroll.Name = "PlayerScroll"
 playerScroll.Parent = mainFrame
 
-local playerListLayout = Instance.new("UIListLayout")
-playerListLayout.Padding = UDim.new(0, 4)
-playerListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-playerListLayout.Parent = playerScroll
+local layout = Instance.new("UIListLayout")
+layout.Padding = UDim.new(0, 4)
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+layout.Parent = playerScroll
 
-local selectedPlayer = nil
+-- Sound function
+local function createSound(parent)
+	local sound = Instance.new("Sound")
+	sound.SoundId = CLICK_SOUND_ID
+	sound.Volume = 1
+	sound.Name = "ClickSound"
+	sound.Parent = parent
+	return sound
+end
 
--- Utility: Create button
-local function createButton(text)
+-- Create custom button
+local function createButton(text, onClick)
 	local btn = Instance.new("TextButton")
 	btn.Size = UDim2.new(1, -10, 0, 40)
 	btn.Text = text
@@ -111,49 +122,60 @@ local function createButton(text)
 	btn.Font = Enum.Font.Gotham
 	btn.TextScaled = true
 	btn.AutoButtonColor = false
-	local sound = Instance.new("Sound")
-	sound.SoundId = CLICK_SOUND_ID
-	sound.Volume = 1
-	sound.Parent = btn
-	btn.MouseButton1Click:Connect(function()
-		sound:Play()
-		TweenService:Create(btn, TweenInfo.new(0.15), {
-			Size = btn.Size + UDim2.new(0, 4, 0, 4)
-		}):Play()
-		task.wait(0.15)
-		TweenService:Create(btn, TweenInfo.new(0.15), {
-			Size = UDim2.new(1, -10, 0, 40)
-		}):Play()
-	end)
+
+	local sound = createSound(btn)
+
 	local corner = Instance.new("UICorner")
 	corner.CornerRadius = UDim.new(0, 10)
 	corner.Parent = btn
+
+	btn.MouseButton1Click:Connect(function()
+		sound:Play()
+		TweenService:Create(btn, TweenInfo.new(0.1), {
+			Size = btn.Size + UDim2.new(0, 4, 0, 4)
+		}):Play()
+		task.wait(0.1)
+		TweenService:Create(btn, TweenInfo.new(0.1), {
+			Size = UDim2.new(1, -10, 0, 40)
+		}):Play()
+		if onClick then onClick() end
+	end)
+
 	return btn
 end
 
--- Detect & display players
-local function refreshPlayerList()
+-- Populate player list
+local function populatePlayers()
 	playerScroll:ClearAllChildren()
-	playerListLayout.Parent = playerScroll
-	for _, plr in ipairs(Players:GetPlayers()) do
-		if plr ~= player then
-			local btn = createButton(plr.DisplayName)
-			btn.Parent = playerScroll
-			btn.MouseButton1Click:Connect(function()
-				selectedPlayer = plr
-				for _, other in ipairs(playerScroll:GetChildren()) do
+	layout.Parent = playerScroll
+
+	for _, plr in pairs(Players:GetPlayers()) do
+		if plr ~= localPlayer then
+			local button = createButton(plr.DisplayName, function()
+				for _, other in pairs(playerScroll:GetChildren()) do
 					if other:IsA("TextButton") then
 						other.BackgroundColor3 = Color3.new(0, 0, 0)
 					end
 				end
-				btn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-				-- TODO: Populate accessories section here
+				button.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+				print("Selected player:", plr.Name)
 			end)
+			button.Parent = playerScroll
 		end
 	end
 end
 
-Players.PlayerAdded:Connect(refreshPlayerList)
-Players.PlayerRemoving:Connect(refreshPlayerList)
-RunService.RenderStepped:Connect(refreshPlayerList)
-refreshPlayerList()
+-- Update player list when players join/leave
+Players.PlayerAdded:Connect(populatePlayers)
+Players.PlayerRemoving:Connect(populatePlayers)
+populatePlayers()
+
+-- Keep it refreshed every 2 seconds (in case Brookhaven doesn’t trigger events)
+task.spawn(function()
+	while true do
+		task.wait(2)
+		populatePlayers()
+	end
+end) 
+
+print("Rixhu Fit Copy UI Loaded")
