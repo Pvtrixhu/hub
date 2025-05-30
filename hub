@@ -1,16 +1,16 @@
---!strict
 -- Rixhu Fit Copy - Vertical Layout UI with Minimize and Proper Player Detection
 -- Place this script in StarterPlayerScripts or StarterGui
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
 -- SOUND ASSET AND BACKGROUND IMAGE (replace these)
-local CLICK_SOUND_ID = "rbxassetid://9080070218"
-local BACKGROUND_IMAGE_ID = "rbxassetid://81566764268635"
+local CLICK_SOUND_ID = "rbxassetid://YOUR_CLICK_SOUND_ID"
+local BACKGROUND_IMAGE_ID = "rbxassetid://YOUR_BACKGROUND_IMAGE_ID"
 
 -- Main ScreenGui
 local screenGui = Instance.new("ScreenGui")
@@ -38,27 +38,29 @@ uiCorner.Parent = mainFrame
 
 -- Title Label
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0.08, 0)
-title.Position = UDim2.new(0, 0, 0, 0)
+title.Size = UDim2.new(0.9, 0, 0.08, 0)
+title.Position = UDim2.new(0.05, 0, 0, 0)
 title.BackgroundTransparency = 1
 title.Text = "Rixhu Fit Copy"
 title.TextColor3 = Color3.new(1, 1, 1)
 title.Font = Enum.Font.GothamBold
 title.TextScaled = true
+title.Name = "Title"
 title.Parent = mainFrame
 
--- Minimize button (top-right corner)
+-- Minimize button (top-right corner, small)
 local minimizeBtn = Instance.new("TextButton")
-minimizeBtn.Size = UDim2.new(0.2, 0, 0.08, 0)
-minimizeBtn.Position = UDim2.new(0.8, 0, 0, 0)
+minimizeBtn.Size = UDim2.new(0, 24, 0, 24)
+minimizeBtn.Position = UDim2.new(1, -30, 0, 6)
 minimizeBtn.BackgroundColor3 = Color3.new(0, 0, 0)
 minimizeBtn.Text = "_"
 minimizeBtn.TextColor3 = Color3.new(1, 1, 1)
 minimizeBtn.Font = Enum.Font.GothamBold
 minimizeBtn.TextScaled = true
+minimizeBtn.Name = "MinimizeBtn"
 minimizeBtn.Parent = mainFrame
 local btnCorner = Instance.new("UICorner")
-btnCorner.CornerRadius = UDim.new(0, 8)
+btnCorner.CornerRadius = UDim.new(1, 0)
 btnCorner.Parent = minimizeBtn
 
 -- Toggle visibility
@@ -66,7 +68,7 @@ local isMinimized = false
 minimizeBtn.MouseButton1Click:Connect(function()
 	isMinimized = not isMinimized
 	for _, child in ipairs(mainFrame:GetChildren()) do
-		if child ~= minimizeBtn then
+		if child.Name ~= "MinimizeBtn" then
 			child.Visible = not isMinimized
 		end
 	end
@@ -153,4 +155,5 @@ end
 
 Players.PlayerAdded:Connect(refreshPlayerList)
 Players.PlayerRemoving:Connect(refreshPlayerList)
+RunService.RenderStepped:Connect(refreshPlayerList)
 refreshPlayerList()
