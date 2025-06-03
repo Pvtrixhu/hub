@@ -1,110 +1,187 @@
--- LocalScript inside StarterGui > ScreenGui
-local Players = game:GetService("Players")
+-- Roblox Starter UI Script with Blur, Image Background, and Fade Effects
 local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
+local SoundService = game:GetService("SoundService")
 local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
+local PlayerGui = player:WaitForChild("PlayerGui")
 
 -- Blur Effect
-local blur = Instance.new("BlurEffect", Lighting)
+local blur = Instance.new("BlurEffect")
 blur.Size = 0
+blur.Parent = Lighting
+TweenService:Create(blur, TweenInfo.new(1.5), {Size = 20}):Play()
 
--- ScreenGui Setup
-local screenGui = script.Parent
-screenGui.IgnoreGuiInset = true
+-- GUI Setup
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "StartupUI"
 screenGui.ResetOnSpawn = false
-screenGui.Name = "RixhuExecutor"
+screenGui.IgnoreGuiInset = true
+screenGui.Parent = PlayerGui
 
--- Fade Background
-local fadeFrame = Instance.new("Frame", screenGui)
-fadeFrame.Size = UDim2.new(1, 0, 1, 0)
-fadeFrame.BackgroundColor3 = Color3.new(0, 0, 0)
-fadeFrame.BackgroundTransparency = 1
-fadeFrame.ZIndex = 1
+-- Image Background
+local bgImage = Instance.new("ImageLabel")
+bgImage.Size = UDim2.new(0, 400, 0, 300)
+bgImage.Position = UDim2.new(0.5, 0, 0.5, 0)
+bgImage.AnchorPoint = Vector2.new(0.5, 0.5)
+bgImage.Image = "rbxassetid://92089575811118"
+bgImage.BackgroundTransparency = 1
+bgImage.ImageTransparency = 1
+bgImage.ScaleType = Enum.ScaleType.Stretch
+bgImage.Parent = screenGui
 
--- Main Frame
-local mainFrame = Instance.new("Frame", screenGui)
-mainFrame.Size = UDim2.new(0, 320, 0, 360)
-mainFrame.Position = UDim2.new(0.5, -160, 0.5, -180)
-mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-mainFrame.BackgroundTransparency = 1
-mainFrame.ZIndex = 2
+local corner = Instance.new("UICorner", bgImage)
+corner.CornerRadius = UDim.new(0, 16)
 
--- Image Box
-local imageBox = Instance.new("ImageLabel", mainFrame)
-imageBox.Size = UDim2.new(1, 0, 1, 0)
-imageBox.Image = "rbxassetid://YOUR_IMAGE_ID" -- Replace this
-imageBox.ScaleType = Enum.ScaleType.Stretch
-imageBox.BackgroundTransparency = 1
-imageBox.ZIndex = 2
+-- Custom Letter Box
+local textBox = Instance.new("TextBox")
+textBox.Size = UDim2.new(0.8, 0, 0.2, 0)
+textBox.Position = UDim2.new(0.5, 0, 0.2, 0)
+textBox.AnchorPoint = Vector2.new(0.5, 0.5)
+textBox.PlaceholderText = "Enter your message..."
+textBox.Text = ""
+textBox.Font = Enum.Font.DenkOne
+textBox.TextScaled = true
+textBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+textBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+textBox.BackgroundTransparency = 1
+textBox.Parent = bgImage
 
--- Letter Box
-local title = Instance.new("TextLabel", mainFrame)
-title.Size = UDim2.new(0.8, 0, 0, 60)
-title.Position = UDim2.new(0.5, 0, 0, 20)
-title.AnchorPoint = Vector2.new(0.5, 0)
-title.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-title.Text = "RIXHU GUI"
-title.Font = Enum.Font.GothamBold
-title.TextColor3 = Color3.new(1, 1, 1)
-title.TextSize = 28
-title.BackgroundTransparency = 0.2
-title.ZIndex = 3
-Instance.new("UICorner", title).CornerRadius = UDim.new(0, 16)
+local tbCorner = Instance.new("UICorner", textBox)
+tbCorner.CornerRadius = UDim.new(0, 8)
 
--- Click Sound
-local clickSound = Instance.new("Sound", screenGui)
-clickSound.SoundId = "rbxassetid://YOUR_SOUND_ID" -- Replace this
+-- Button Sound
+local clickSound = Instance.new("Sound")
+clickSound.SoundId = "rbxassetid://4499400560"
 clickSound.Volume = 1
+clickSound.Parent = SoundService
 
--- Button Factory
-local function createButton(name, text, yPos)
-	local btn = Instance.new("TextButton", mainFrame)
-	btn.Size = UDim2.new(0.6, 0, 0, 50)
-	btn.Position = UDim2.new(0.5, 0, 0, yPos)
-	btn.AnchorPoint = Vector2.new(0.5, 0)
-	btn.BackgroundColor3 = Color3.new(0, 0, 0)
-	btn.TextColor3 = Color3.new(1, 1, 1)
-	btn.Font = Enum.Font.GothamBold
-	btn.Text = text
-	btn.TextSize = 22
-	btn.Name = name
-	btn.ZIndex = 3
-	btn.AutoButtonColor = false
-	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 14)
-	return btn
+-- Create a Button
+local function createButton(name, text, position)
+    local button = Instance.new("TextButton")
+    button.Name = name
+    button.Size = UDim2.new(0.6, 0, 0.15, 0)
+    button.Position = position
+    button.AnchorPoint = Vector2.new(0.5, 0.5)
+    button.Text = text
+    button.Font = Enum.Font.DenkOne
+    button.TextScaled = true
+    button.TextColor3 = Color3.new(1, 1, 1)
+    button.BackgroundColor3 = Color3.new(0, 0, 0)
+    button.BackgroundTransparency = 0.2
+    button.Parent = bgImage
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = button
+
+    return button
 end
 
-local onBtn = createButton("OnButton", "On", 100)
-local offBtn = createButton("OffButton", "Off", 170)
+-- Buttons
+local buttonOn = createButton("ButtonOn", "ON", UDim2.new(0.5, 0, 0.55, 0))
+local buttonOff = createButton("ButtonOff", "OFF", UDim2.new(0.5, 0, 0.75, 0))
 
--- Pop Animation
-local function pop(button)
-	local origSize = button.Size
-	local grow = TweenService:Create(button, TweenInfo.new(0.1), {Size = origSize + UDim2.new(0, 6, 0, 6)})
-	local shrink = TweenService:Create(button, TweenInfo.new(0.1), {Size = origSize})
-	grow:Play()
-	grow.Completed:Wait()
-	shrink:Play()
+-- Pop Effect Function
+local function popEffect(btn)
+    local grow = TweenService:Create(btn, TweenInfo.new(0.1), {Size = btn.Size + UDim2.new(0, 10, 0, 10)})
+    local shrink = TweenService:Create(btn, TweenInfo.new(0.1), {Size = btn.Size})
+    grow:Play()
+    grow.Completed:Connect(function()
+        shrink:Play()
+    end)
 end
 
--- Fade In
-TweenService:Create(fadeFrame, TweenInfo.new(1), {BackgroundTransparency = 0.3}):Play()
-TweenService:Create(blur, TweenInfo.new(1), {Size = 24}):Play()
-
--- Fade Out Utility
-local function fadeOutGui(callback)
-	TweenService:Create(fadeFrame, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
-	TweenService:Create(blur, TweenInfo.new(1), {Size = 0}):Play()
-	TweenService:Create(mainFrame, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
-	task.wait(1.1)
-	screenGui:Destroy()
-	blur:Destroy()
-	if callback then callback() end
+-- Fade Out UI
+local function fadeOutUI()
+    TweenService:Create(blur, TweenInfo.new(1), {Size = 0}):Play()
+    TweenService:Create(bgImage, TweenInfo.new(1), {ImageTransparency = 1}):Play()
+    TweenService:Create(textBox, TweenInfo.new(1), {TextTransparency = 1}):Play()
+    TweenService:Create(buttonOn, TweenInfo.new(1), {TextTransparency = 1, BackgroundTransparency = 1}):Play()
+    TweenService:Create(buttonOff, TweenInfo.new(1), {TextTransparency = 1, BackgroundTransparency = 1}):Play()
+    task.delay(1.2, function()
+        screenGui:Destroy()
+        blur:Destroy()
+    end)
 end
 
--- Full BYPASS Script
-local bypassCode = [==[
+-- Button Actions
+buttonOn.MouseButton1Click:Connect(function()
+    popEffect(buttonOn)
+    clickSound:Play()
+    fadeOutUI()
+    -- Execute your script logic here
+    print("ON Clicked - Run Script")
+end)
+
+buttonOff.MouseButton1Click:Connect(function()
+    popEffect(buttonOff)
+    clickSound:Play()
+    fadeOutUI()
+    -- Reset player
+    player:LoadCharacter()
+end)
+
+-- Initial UI fade-in
+TweenService:Create(bgImage, TweenInfo.new(1.5), {ImageTransparency = 0.1}):Play()
+
+local TweenService = game:GetService("TweenService")
+local CoreGui = game:GetService("CoreGui")
+local Lighting = game:GetService("Lighting")
+
+local splashGui = Instance.new("ScreenGui")
+splashGui.IgnoreGuiInset = true
+splashGui.ResetOnSpawn = false
+splashGui.Name = "SplashGui"
+splashGui.Parent = CoreGui
+
+local blur = Instance.new("BlurEffect")
+blur.Size = 24
+blur.Parent = Lighting
+
+local customOverlay = Instance.new("ImageLabel")
+customOverlay.Size = UDim2.new(1, 0, 1, 0)
+customOverlay.BackgroundTransparency = 1
+customOverlay.Image = "rbxassetid://98787600165060"
+customOverlay.ImageTransparency = 0.75
+customOverlay.ScaleType = Enum.ScaleType.Stretch
+customOverlay.ZIndex = 1
+customOverlay.Parent = splashGui
+
+local splashText = Instance.new("TextLabel")
+splashText.Size = UDim2.new(1, 0, 1, 0)
+splashText.BackgroundTransparency = 1
+splashText.TextScaled = true
+splashText.TextColor3 = Color3.fromRGB(0, 0, 0)
+splashText.Font = Enum.Font.DenkOne
+splashText.Text = "R I X H U"
+splashText.TextTransparency = 1
+splashText.ZIndex = 2
+splashText.Parent = splashGui
+
+local splashSound = Instance.new("Sound")
+splashSound.SoundId = "rbxassetid://9072301639"
+splashSound.Volume = 1
+splashSound.Looped = false
+splashSound.Parent = splashGui
+splashSound:Play()
+
+TweenService:Create(blur, TweenInfo.new(1.5), {Size = 24}):Play()
+TweenService:Create(customOverlay, TweenInfo.new(1.5), {ImageTransparency = 0.3}):Play()
+TweenService:Create(splashText, TweenInfo.new(1.5), {TextTransparency = 0}):Play()
+
+task.wait(3)
+
+TweenService:Create(blur, TweenInfo.new(1.5), {Size = 0}):Play()
+TweenService:Create(customOverlay, TweenInfo.new(1.5), {ImageTransparency = 1}):Play()
+TweenService:Create(splashText, TweenInfo.new(1.5), {TextTransparency = 1}):Play()
+TweenService:Create(splashSound, TweenInfo.new(1.5), {Volume = 0}):Play()
+
+task.wait(1.5)
+
+blur:Destroy()
+splashGui:Destroy()
+
 local SoundService = game:GetService("SoundService")
 local introSound = Instance.new("Sound")
 introSound.SoundId = "rbxassetid://5797595098"
@@ -1212,23 +1289,18 @@ local function C_18()
     end)
 end
 task.spawn(C_18)
+
+return G2L["1"], require
 end
-]==]
 
--- Button Actions
-onBtn.MouseButton1Click:Connect(function()
-	clickSound:Play()
-	pop(onBtn)
-	fadeOutGui(function()
-		loadstring(bypassCode)()
-	end)
+button1.MouseButton1Click:Connect(function()
+	popEffect(button1)
+	fadeOutAll()
+	runScript1()
 end)
 
-offBtn.MouseButton1Click:Connect(function()
-	clickSound:Play()
-	pop(offBtn)
-	fadeOutGui(function()
-		Players.LocalPlayer:LoadCharacter()
-	end)
+button2.MouseButton1Click:Connect(function()
+	popEffect(button2)
+	fadeOutAll()
+	runScript2()
 end)
-
