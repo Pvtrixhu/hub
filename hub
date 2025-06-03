@@ -1,3 +1,4 @@
+
 -- Roblox Starter UI Script with Blur, Image Background, and Fade Effects
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
@@ -24,9 +25,9 @@ local bgImage = Instance.new("ImageLabel")
 bgImage.Size = UDim2.new(0, 400, 0, 300)
 bgImage.Position = UDim2.new(0.5, 0, 0.5, 0)
 bgImage.AnchorPoint = Vector2.new(0.5, 0.5)
-bgImage.Image = "rbxassetid://10974499398" -- working image asset
+bgImage.Image = "rbxassetid://92089575811118"
 bgImage.BackgroundTransparency = 1
-bgImage.ImageTransparency = 0.1 -- ensure visible immediately
+bgImage.ImageTransparency = 1
 bgImage.ScaleType = Enum.ScaleType.Stretch
 bgImage.Parent = screenGui
 
@@ -50,16 +51,11 @@ textBox.Parent = bgImage
 local tbCorner = Instance.new("UICorner", textBox)
 tbCorner.CornerRadius = UDim.new(0, 8)
 
--- Button Sounds
-local soundOn = Instance.new("Sound")
-soundOn.SoundId = "rbxassetid://9072301639"
-soundOn.Volume = 1
-soundOn.Parent = SoundService
-
-local soundOff = Instance.new("Sound")
-soundOff.SoundId = "rbxassetid://5797595098"
-soundOff.Volume = 1
-soundOff.Parent = SoundService
+-- Button Sound
+local clickSound = Instance.new("Sound")
+clickSound.SoundId = "rbxassetid://4499400560"
+clickSound.Volume = 1
+clickSound.Parent = SoundService
 
 -- Create a Button
 local function createButton(name, text, position)
@@ -98,7 +94,7 @@ local function popEffect(btn)
 end
 
 -- Fade Out UI
-local function fadeOutUI(callback)
+local function fadeOutUI()
     TweenService:Create(blur, TweenInfo.new(1), {Size = 0}):Play()
     TweenService:Create(bgImage, TweenInfo.new(1), {ImageTransparency = 1}):Play()
     TweenService:Create(textBox, TweenInfo.new(1), {TextTransparency = 1}):Play()
@@ -107,19 +103,30 @@ local function fadeOutUI(callback)
     task.delay(1.2, function()
         screenGui:Destroy()
         blur:Destroy()
-        if callback then callback() end
     end)
 end
 
--- Sample script logic to run on "ON" button
-local function executeCustomScript()
-    local StarterGui = game:GetService("StarterGui")
-    StarterGui:SetCore("SendNotification", {
-        Title = "Activated!",
-        Text = "Your custom script has been triggered.",
-        Duration = 5
-    })
-    local TweenService = game:GetService("TweenService")
+-- Button Actions
+buttonOn.MouseButton1Click:Connect(function()
+    popEffect(buttonOn)
+    clickSound:Play()
+    fadeOutUI()
+    -- Execute your script logic here
+    print("ON Clicked - Run Script")
+end)
+
+buttonOff.MouseButton1Click:Connect(function()
+    popEffect(buttonOff)
+    clickSound:Play()
+    fadeOutUI()
+    -- Reset player
+    player:LoadCharacter()
+end)
+
+-- Initial UI fade-in
+TweenService:Create(bgImage, TweenInfo.new(1.5), {ImageTransparency = 0.1}):Play()
+
+local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
 local Lighting = game:GetService("Lighting")
 
@@ -1297,20 +1304,4 @@ button2.MouseButton1Click:Connect(function()
 	popEffect(button2)
 	fadeOutAll()
 	runScript2()
-end)
-end
-
--- Button Actions
-buttonOn.MouseButton1Click:Connect(function()
-    popEffect(buttonOn)
-    soundOn:Play()
-    fadeOutUI(executeCustomScript)
-end)
-
-buttonOff.MouseButton1Click:Connect(function()
-    popEffect(buttonOff)
-    soundOff:Play()
-    fadeOutUI(function()
-        player:LoadCharacter()
-    end)
 end)
