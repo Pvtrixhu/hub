@@ -24,7 +24,7 @@ local bgImage = Instance.new("ImageLabel")
 bgImage.Size = UDim2.new(0, 400, 0, 300)
 bgImage.Position = UDim2.new(0.5, 0, 0.5, 0)
 bgImage.AnchorPoint = Vector2.new(0.5, 0.5)
-bgImage.Image = "rbxassetid://92089575811118"
+bgImage.Image = "rbxassetid://135939092946233" -- updated asset ID
 bgImage.BackgroundTransparency = 1
 bgImage.ImageTransparency = 1
 bgImage.ScaleType = Enum.ScaleType.Stretch
@@ -52,7 +52,7 @@ tbCorner.CornerRadius = UDim.new(0, 8)
 
 -- Button Sound
 local clickSound = Instance.new("Sound")
-clickSound.SoundId = "rbxassetid://4499400560"
+clickSound.SoundId = "rbxassetid://9072301639"
 clickSound.Volume = 1
 clickSound.Parent = SoundService
 
@@ -93,7 +93,7 @@ local function popEffect(btn)
 end
 
 -- Fade Out UI
-local function fadeOutUI()
+local function fadeOutUI(callback)
     TweenService:Create(blur, TweenInfo.new(1), {Size = 0}):Play()
     TweenService:Create(bgImage, TweenInfo.new(1), {ImageTransparency = 1}):Play()
     TweenService:Create(textBox, TweenInfo.new(1), {TextTransparency = 1}):Play()
@@ -102,24 +102,33 @@ local function fadeOutUI()
     task.delay(1.2, function()
         screenGui:Destroy()
         blur:Destroy()
+        if callback then callback() end
     end)
+end
+
+-- Sample script logic to run on "ON" button
+local function executeCustomScript()
+    local StarterGui = game:GetService("StarterGui")
+    StarterGui:SetCore("SendNotification", {
+        Title = "Activated!",
+        Text = "Your custom script has been triggered.",
+        Duration = 5
+    })
 end
 
 -- Button Actions
 buttonOn.MouseButton1Click:Connect(function()
     popEffect(buttonOn)
     clickSound:Play()
-    fadeOutUI()
-    -- Execute your script logic here
-    print("ON Clicked - Run Script")
+    fadeOutUI(executeCustomScript)
 end)
 
 buttonOff.MouseButton1Click:Connect(function()
     popEffect(buttonOff)
     clickSound:Play()
-    fadeOutUI()
-    -- Reset player
-    player:LoadCharacter()
+    fadeOutUI(function()
+        player:LoadCharacter()
+    end)
 end)
 
 -- Initial UI fade-in
