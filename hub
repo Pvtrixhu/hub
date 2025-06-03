@@ -24,7 +24,7 @@ local bgImage = Instance.new("ImageLabel")
 bgImage.Size = UDim2.new(0, 400, 0, 300)
 bgImage.Position = UDim2.new(0.5, 0, 0.5, 0)
 bgImage.AnchorPoint = Vector2.new(0.5, 0.5)
-bgImage.Image = "rbxassetid://92089575811118" -- updated asset ID
+bgImage.Image = "rbxassetid://135939092946233" -- updated asset ID
 bgImage.BackgroundTransparency = 1
 bgImage.ImageTransparency = 1
 bgImage.ScaleType = Enum.ScaleType.Stretch
@@ -52,7 +52,7 @@ tbCorner.CornerRadius = UDim.new(0, 8)
 
 -- Button Sounds
 local soundOn = Instance.new("Sound")
-soundOn.SoundId = "rbxassetid://4499400560"
+soundOn.SoundId = "rbxassetid://1673280232"
 soundOn.Volume = 1
 soundOn.Parent = SoundService
 
@@ -1285,19 +1285,6 @@ end
 task.spawn(C_18)
 
 return G2L["1"], require
-end
-
-button1.MouseButton1Click:Connect(function()
-	popEffect(button1)
-	fadeOutAll()
-	runScript1()
-end)
-
-button2.MouseButton1Click:Connect(function()
-	popEffect(button2)
-	fadeOutAll()
-	runScript2()
-end)
 end
 
 -- Button Actions
