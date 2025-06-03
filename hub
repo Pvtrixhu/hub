@@ -25,8 +25,8 @@ bgImage.Size = UDim2.new(0, 400, 0, 300)
 bgImage.Position = UDim2.new(0.5, 0, 0.5, 0)
 bgImage.AnchorPoint = Vector2.new(0.5, 0.5)
 bgImage.Image = "rbxassetid://92089575811118" -- working image asset
-bgImage.BackgroundTransparency = 1
-bgImage.ImageTransparency = 0.1 -- ensure visible immediately
+bgImage.BackgroundTransparency = 0.2
+bgImage.ImageTransparency = 1 -- ensure visible immediately
 bgImage.ScaleType = Enum.ScaleType.Stretch
 bgImage.Parent = screenGui
 
