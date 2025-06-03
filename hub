@@ -24,7 +24,7 @@ local bgImage = Instance.new("ImageLabel")
 bgImage.Size = UDim2.new(0, 400, 0, 300)
 bgImage.Position = UDim2.new(0.5, 0, 0.5, 0)
 bgImage.AnchorPoint = Vector2.new(0.5, 0.5)
-bgImage.Image = "rbxassetid://10974499398" -- working image asset
+bgImage.Image = "rbxassetid://92089575811118" -- working image asset
 bgImage.BackgroundTransparency = 1
 bgImage.ImageTransparency = 0.1 -- ensure visible immediately
 bgImage.ScaleType = Enum.ScaleType.Stretch
@@ -52,12 +52,12 @@ tbCorner.CornerRadius = UDim.new(0, 8)
 
 -- Button Sounds
 local soundOn = Instance.new("Sound")
-soundOn.SoundId = "rbxassetid://9072301639"
+soundOn.SoundId = "rbxassetid://1673280232"
 soundOn.Volume = 1
 soundOn.Parent = SoundService
 
 local soundOff = Instance.new("Sound")
-soundOff.SoundId = "rbxassetid://5797595098"
+soundOff.SoundId = "rbxassetid://1673280232"
 soundOff.Volume = 1
 soundOff.Parent = SoundService
 
