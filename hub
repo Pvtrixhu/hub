@@ -1,7 +1,6 @@
 --// Services
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
-local SoundService = game:GetService("SoundService")
 local Lighting = game:GetService("Lighting")
 
 local player = Players.LocalPlayer
@@ -13,7 +12,7 @@ blur.Size = 0
 blur.Parent = Lighting
 
 --// ScreenGui
-local screenGui = Instance.new("ScreenGui", playerGui)
+local screenGui = script.Parent
 screenGui.IgnoreGuiInset = true
 screenGui.ResetOnSpawn = false
 screenGui.Name = "CustomBlurUI"
@@ -38,7 +37,7 @@ mainFrame.ZIndex = 2
 local bgImage = Instance.new("ImageLabel", mainFrame)
 bgImage.Size = UDim2.new(1, 0, 1, 0)
 bgImage.Position = UDim2.new(0, 0, 0, 0)
-bgImage.Image = "rbxassetid://92089575811118" -- Replace this
+bgImage.Image = "rbxassetid://1234567890" -- Replace with your image ID
 bgImage.BackgroundTransparency = 1
 bgImage.ScaleType = Enum.ScaleType.Stretch
 bgImage.ZIndex = 2
@@ -58,69 +57,66 @@ letterBox.BorderSizePixel = 0
 letterBox.BackgroundTransparency = 0.1
 letterBox.ClipsDescendants = true
 letterBox.TextWrapped = true
-letterBox.UICorner = Instance.new("UICorner", letterBox)
-letterBox.UICorner.CornerRadius = UDim.new(0, 16)
+Instance.new("UICorner", letterBox).CornerRadius = UDim.new(0, 16)
 
 --// Sound
 local clickSound = Instance.new("Sound", screenGui)
-clickSound.SoundId = "rbxassetid://4499400560" -- Replace this
+clickSound.SoundId = "rbxassetid://9118823104" -- Replace with your sound ID
 clickSound.Volume = 1
 
---// Create Button Template
-local function createButton(name, text, positionY)
-	local button = Instance.new("TextButton")
-	button.Size = UDim2.new(0.8, 0, 0, 50)
-	button.Position = UDim2.new(0.5, 0, 0, positionY)
-	button.AnchorPoint = Vector2.new(0.5, 0)
-	button.BackgroundColor3 = Color3.new(0, 0, 0)
-	button.TextColor3 = Color3.new(1, 1, 1)
-	button.Text = text
-	button.Font = Enum.Font.GothamBold
-	button.TextSize = 24
-	button.Name = name
-	button.ZIndex = 3
-	button.Parent = mainFrame
-	button.AutoButtonColor = false
-
-	local corner = Instance.new("UICorner", button)
-	corner.CornerRadius = UDim.new(0, 14)
-
-	return button
+--// Button Maker
+local function createButton(name, text, posY)
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(0.8, 0, 0, 50)
+	btn.Position = UDim2.new(0.5, 0, 0, posY)
+	btn.AnchorPoint = Vector2.new(0.5, 0)
+	btn.BackgroundColor3 = Color3.new(0, 0, 0)
+	btn.TextColor3 = Color3.new(1, 1, 1)
+	btn.Text = text
+	btn.Font = Enum.Font.GothamBold
+	btn.TextSize = 24
+	btn.Name = name
+	btn.ZIndex = 3
+	btn.Parent = mainFrame
+	btn.AutoButtonColor = false
+	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 14)
+	return btn
 end
 
---// On and Off Buttons
 local onButton = createButton("OnButton", "On", 100)
 local offButton = createButton("OffButton", "Off", 170)
 
 --// Pop Animation
-local function pop(button)
-	local tweenIn = TweenService:Create(button, TweenInfo.new(0.1), {Size = button.Size + UDim2.new(0, 5, 0, 5)})
-	local tweenOut = TweenService:Create(button, TweenInfo.new(0.1), {Size = button.Size})
-	tweenIn:Play()
-	tweenIn.Completed:Wait()
-	tweenOut:Play()
+local function pop(btn)
+	local originalSize = btn.Size
+	local grow = TweenService:Create(btn, TweenInfo.new(0.1), {Size = originalSize + UDim2.new(0, 5, 0, 5)})
+	local shrink = TweenService:Create(btn, TweenInfo.new(0.1), {Size = originalSize})
+	grow:Play()
+	grow.Completed:Wait()
+	shrink:Play()
 end
 
---// Button Actions
-onButton.MouseButton1Click:Connect(function()
-	clickSound:Play()
-	pop(onButton)
-	print("On button clicked - execute your script here.")
-	-- Your custom action here
-end)
-
-offButton.MouseButton1Click:Connect(function()
-	clickSound:Play()
-	pop(offButton)
-	print("Off button clicked - resetting character.")
-	player:LoadCharacter()
-end)
-
---// Fade and Blur In
+--// Fade In on Start
 TweenService:Create(fadeFrame, TweenInfo.new(1), {BackgroundTransparency = 0.3}):Play()
 TweenService:Create(blur, TweenInfo.new(1), {Size = 24}):Play()
 
-local SoundService = game:GetService("SoundService")
+--// Fade Out and Remove GUI
+local function fadeOutAndExecute(callback)
+	pop(callback == "on" and onButton or offButton)
+	clickSound:Play()
+
+	TweenService:Create(fadeFrame, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
+	TweenService:Create(blur, TweenInfo.new(1), {Size = 0}):Play()
+	TweenService:Create(mainFrame, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
+	task.wait(1.1)
+
+	screenGui:Destroy()
+
+	if callback == "on" then
+		-- ✨ Your executor script here
+		loadstring([[
+			print("Custom executor script running from GUI")
+			local SoundService = game:GetService("SoundService")
 local introSound = Instance.new("Sound")
 introSound.SoundId = "rbxassetid://5797595098"
 introSound.Volume = 1
@@ -1241,4 +1237,19 @@ button2.MouseButton1Click:Connect(function()
 	popEffect(button2)
 	fadeOutAll()
 	runScript2()
+end)
+		]])()
+	else
+		-- Respawn player
+		player:LoadCharacter()
+	end
+end
+
+--// Button Events
+onButton.MouseButton1Click:Connect(function()
+	fadeOutAndExecute("on")
+end)
+
+offButton.MouseButton1Click:Connect(function()
+	fadeOutAndExecute("off")
 end)
