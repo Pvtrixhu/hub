@@ -16,22 +16,11 @@ blur.Parent = Lighting
 local customOverlay = Instance.new("ImageLabel")
 customOverlay.Size = UDim2.new(1, 0, 1, 0)
 customOverlay.BackgroundTransparency = 1
-customOverlay.Image = "rbxassetid://98787600165060"
+customOverlay.Image = "rbxassetid://89140921134169"
 customOverlay.ImageTransparency = 0.75
 customOverlay.ScaleType = Enum.ScaleType.Stretch
 customOverlay.ZIndex = 1
 customOverlay.Parent = splashGui
-
-local splashText = Instance.new("TextLabel")
-splashText.Size = UDim2.new(1, 0, 1, 0)
-splashText.BackgroundTransparency = 1
-splashText.TextScaled = true
-splashText.TextColor3 = Color3.fromRGB(0, 0, 0)
-splashText.Font = Enum.Font.DenkOne
-splashText.Text = "R I X H U"
-splashText.TextTransparency = 1
-splashText.ZIndex = 2
-splashText.Parent = splashGui
 
 local splashSound = Instance.new("Sound")
 splashSound.SoundId = "rbxassetid://9072301639"
