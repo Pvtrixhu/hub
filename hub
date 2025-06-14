@@ -22,6 +22,17 @@ customOverlay.ScaleType = Enum.ScaleType.Stretch
 customOverlay.ZIndex = 1
 customOverlay.Parent = splashGui
 
+local splashText = Instance.new("TextLabel")
+splashText.Size = UDim2.new(1, 0, 1, 0)
+splashText.BackgroundTransparency = 1
+splashText.TextScaled = true
+splashText.TextColor3 = Color3.fromRGB(0, 0, 0)
+splashText.Font = Enum.Font.DenkOne
+splashText.Text = "R I X H U"
+splashText.TextTransparency = 1
+splashText.ZIndex = 2
+splashText.Parent = splashGui
+
 local splashSound = Instance.new("Sound")
 splashSound.SoundId = "rbxassetid://9072301639"
 splashSound.Volume = 1
