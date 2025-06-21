@@ -21,17 +21,6 @@ customOverlay.ScaleType = Enum.ScaleType.Stretch
 customOverlay.ZIndex = 1
 customOverlay.Parent = splashGui
 
-local splashText = Instance.new("TextLabel")
-splashText.Size = UDim2.new(1, 0, 1, 0)
-splashText.BackgroundTransparency = 1
-splashText.TextScaled = true
-splashText.TextColor3 = Color3.fromRGB(0, 0, 0)
-splashText.Font = Enum.Font.DenkOne
-splashText.Text = "R I X H U"
-splashText.TextTransparency = 1
-splashText.ZIndex = 2
-splashText.Parent = splashGui
-
 local splashSound = Instance.new("Sound")
 splashSound.SoundId = "rbxassetid://9072301639"
 splashSound.Volume = 1
@@ -41,13 +30,11 @@ splashSound:Play()
 
 TweenService:Create(blur, TweenInfo.new(1.5), {Size = 24}):Play()
 TweenService:Create(customOverlay, TweenInfo.new(1.5), {ImageTransparency = 0.3}):Play()
-TweenService:Create(splashText, TweenInfo.new(1.5), {TextTransparency = 0}):Play()
 
 task.wait(3)
 
 TweenService:Create(blur, TweenInfo.new(1.5), {Size = 0}):Play()
 TweenService:Create(customOverlay, TweenInfo.new(1.5), {ImageTransparency = 1}):Play()
-TweenService:Create(splashText, TweenInfo.new(1.5), {TextTransparency = 1}):Play()
 TweenService:Create(splashSound, TweenInfo.new(1.5), {Volume = 0}):Play()
 
 task.wait(1.5)
