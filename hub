@@ -5,16 +5,21 @@ local Players = game:GetService("Players")
 local SoundService = game:GetService("SoundService")
 local player = Players.LocalPlayer
 
+-- TRACK CREATED INSTANCES FOR CLEANUP
+local createdInstances = {}
+
 -- SPLASH GUI
 local splashGui = Instance.new("ScreenGui")
 splashGui.IgnoreGuiInset = true
 splashGui.ResetOnSpawn = false
 splashGui.Name = "SplashGui"
 splashGui.Parent = CoreGui
+table.insert(createdInstances, splashGui)
 
 local blur = Instance.new("BlurEffect")
 blur.Size = 24
 blur.Parent = Lighting
+table.insert(createdInstances, blur)
 
 local customOverlay = Instance.new("ImageLabel")
 customOverlay.Size = UDim2.new(1, 0, 1, 0)
@@ -40,16 +45,17 @@ TweenService:Create(blur, TweenInfo.new(1.5), {Size = 0}):Play()
 TweenService:Create(customOverlay, TweenInfo.new(1.5), {ImageTransparency = 1}):Play()
 TweenService:Create(splashSound, TweenInfo.new(1.5), {Volume = 0}):Play()
 task.wait(1.5)
-blur:Destroy()
 splashGui:Destroy()
+blur:Destroy()
 
--- RIXHU WATERMARK BUTTON
+-- RIXHU WATERMARK GUI
 local gui = Instance.new("ScreenGui")
 gui.Name = "WatermarkGui"
 gui.ResetOnSpawn = false
 gui.IgnoreGuiInset = true
 gui.DisplayOrder = 9999
 gui.Parent = player:WaitForChild("PlayerGui")
+table.insert(createdInstances, gui)
 
 local textButton = Instance.new("TextButton")
 textButton.Name = "RIXHU_Watermark"
@@ -65,7 +71,7 @@ textButton.ZIndex = 10
 textButton.Parent = gui
 
 local clickSound = Instance.new("Sound")
-clickSound.SoundId = "rbxassetid://7227567562" -- 🔊 Insert your sound ID here
+clickSound.SoundId = "rbxassetid://PUT_SOUND_ID_HERE" -- 🔊 Replace with your Sound ID
 clickSound.Volume = 1
 clickSound.Parent = textButton
 
@@ -88,7 +94,14 @@ textButton.MouseButton1Click:Connect(function()
 
 	clickSound:Play()
 	clickSound.Ended:Wait()
-	gui:Destroy()
+
+	-- DESTROY EVERYTHING CREATED
+	for _, inst in pairs(createdInstances) do
+		pcall(function() inst:Destroy() end)
+	end
+
+	-- OPTIONAL: Stop this script from running anything else
+	script:Destroy() -- ONLY works if this script is in a LocalScript object
 end)
 
 local SoundService = game:GetService("SoundService")
