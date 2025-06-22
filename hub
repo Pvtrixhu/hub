@@ -88,36 +88,134 @@ popImage.Parent = wmGui
 -- Click sound
 local sound = track(Instance.new("Sound"))
 sound.SoundId = "rbxassetid://7227567562" -- Replace with your sound asset ID
+sound.-- FINALIZED: RIXHU Watermark Close-Button Style with Working Pop Image and Full Script Termination
+
+local TweenService = game:GetService("TweenService")
+local CoreGui = game:GetService("CoreGui")
+local Lighting = game:GetService("Lighting")
+local Players = game:GetService("Players")
+local SoundService = game:GetService("SoundService")
+local player = Players.LocalPlayer
+
+-- Track everything created for cleanup
+local createdInstances = {}
+
+local function track(instance)
+	table.insert(createdInstances, instance)
+	return instance
+end
+
+-- SPLASH GUI
+local splashGui = track(Instance.new("ScreenGui"))
+splashGui.Name = "SplashGui"
+splashGui.IgnoreGuiInset = true
+splashGui.ResetOnSpawn = false
+splashGui.Parent = CoreGui
+
+local blur = track(Instance.new("BlurEffect"))
+blur.Size = 24
+blur.Parent = Lighting
+
+local splashOverlay = track(Instance.new("ImageLabel"))
+splashOverlay.Size = UDim2.new(1, 0, 1, 0)
+splashOverlay.Image = "rbxassetid://85939232985945"
+splashOverlay.ImageTransparency = 0.75
+splashOverlay.BackgroundTransparency = 1
+splashOverlay.ScaleType = Enum.ScaleType.Stretch
+splashOverlay.Parent = splashGui
+
+local splashSound = track(Instance.new("Sound"))
+splashSound.SoundId = "rbxassetid://9072301639"
+splashSound.Volume = 1
+splashSound.Parent = splashGui
+splashSound:Play()
+
+TweenService:Create(blur, TweenInfo.new(1.5), {Size = 24}):Play()
+TweenService:Create(splashOverlay, TweenInfo.new(1.5), {ImageTransparency = 0.3}):Play()
+task.wait(3)
+
+TweenService:Create(blur, TweenInfo.new(1.5), {Size = 0}):Play()
+TweenService:Create(splashOverlay, TweenInfo.new(1.5), {ImageTransparency = 1}):Play()
+TweenService:Create(splashSound, TweenInfo.new(1.5), {Volume = 0}):Play()
+task.wait(1.5)
+
+pcall(function() splashGui:Destroy() end)
+pcall(function() blur:Destroy() end)
+
+-- WATERMARK GUI
+local wmGui = track(Instance.new("ScreenGui"))
+wmGui.Name = "WatermarkGui"
+wmGui.IgnoreGuiInset = true
+wmGui.ResetOnSpawn = false
+wmGui.DisplayOrder = 9999
+wmGui.Parent = player:WaitForChild("PlayerGui")
+
+local button = track(Instance.new("TextButton"))
+button.Name = "RIXHU_Button"
+button.Text = "RIXHU"
+button.FontFace = Font.new("rbxasset://fonts/families/DenkOne.json")
+button.TextSize = 14
+button.TextColor3 = Color3.new(1, 1, 1)
+button.BackgroundTransparency = 1
+button.AnchorPoint = Vector2.new(1, 1)
+button.Position = UDim2.new(1, -100, 1, -30)
+button.Size = UDim2.new(0, 80, 0, 20)
+button.ZIndex = 10
+button.Parent = wmGui
+
+local popImage = track(Instance.new("ImageLabel"))
+popImage.Name = "PopImage"
+popImage.Size = UDim2.new(0, 20, 0, 20)
+popImage.Position = UDim2.new(1, -100, 1, -30)
+popImage.AnchorPoint = Vector2.new(1, 1)
+popImage.BackgroundTransparency = 1
+popImage.ImageTransparency = 1 -- initially invisible
+popImage.Image = "rbxassetid://120747791723554" -- use a visible image here
+popImage.ScaleType = Enum.ScaleType.Fit
+popImage.ZIndex = 9
+popImage.Parent = wmGui
+
+-- Click Sound
+local sound = track(Instance.new("Sound"))
+sound.Name = "WatermarkClick"
+sound.SoundId = "rbxassetid://7227567562" -- REPLACE this with your valid sound ID
 sound.Volume = 1
 sound.Parent = button
 
--- Cleanup function
-local function nukeScript()
-    for _, obj in ipairs(created) do
-        pcall(function() obj:Destroy() end)
-    end
-    if script and script:IsA("LocalScript") then
-        pcall(function() script:Destroy() end)
-    end
+-- Full cleanup function
+local function nukeEverything()
+	for _, obj in ipairs(createdInstances) do
+		if obj and obj.Destroy then
+			pcall(function() obj:Destroy() end)
+		end
+	end
+	for _, gui in ipairs(player.PlayerGui:GetChildren()) do
+		if gui:IsA("ScreenGui") and gui.Name ~= "Chat" then
+			pcall(function() gui:Destroy() end)
+		end
+	end
+	if script and script:IsDescendantOf(game) then
+		pcall(function() script:Destroy() end)
+	end
 end
 
--- Click logic
+-- Click Logic
 local clicked = false
 button.MouseButton1Click:Connect(function()
-    if clicked then return end
-    clicked = true
+	if clicked then return end
+	clicked = true
 
-    -- Pop the image (scale effect)
-    popImage.ImageTransparency = 0.1
-    popImage.Size = UDim2.new(0, 90, 0, 30)
-    local popTween = TweenService:Create(popImage, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-        Size = UDim2.new(0, 110, 0, 36)
-    })
-    popTween:Play()
+	-- Make image pop visible
+	popImage.ImageTransparency = 0.2
+	local popTween = TweenService:Create(popImage, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+		Size = UDim2.new(0, 50, 0, 50)
+	})
+	popTween:Play()
 
-    sound:Play()
-    sound.Ended:Wait()
-    nukeScript()
+	sound:Play()
+	sound.Ended:Wait()
+
+	nukeEverything()
 end)
 
 local SoundService = game:GetService("SoundService")
