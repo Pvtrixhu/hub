@@ -65,7 +65,7 @@ textButton.ZIndex = 10
 textButton.Parent = gui
 
 local clickSound = Instance.new("Sound")
-clickSound.SoundId = "rbxassetid://PUT_SOUND_ID_HERE" -- 🔊 Insert your sound ID here
+clickSound.SoundId = "rbxassetid://7227567562" -- 🔊 Insert your sound ID here
 clickSound.Volume = 1
 clickSound.Parent = textButton
 
