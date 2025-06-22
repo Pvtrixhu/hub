@@ -1,8 +1,11 @@
-
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
 local Lighting = game:GetService("Lighting")
+local Players = game:GetService("Players")
+local SoundService = game:GetService("SoundService")
+local player = Players.LocalPlayer
 
+-- SPLASH GUI
 local splashGui = Instance.new("ScreenGui")
 splashGui.IgnoreGuiInset = true
 splashGui.ResetOnSpawn = false
@@ -31,22 +34,21 @@ splashSound:Play()
 
 TweenService:Create(blur, TweenInfo.new(1.5), {Size = 24}):Play()
 TweenService:Create(customOverlay, TweenInfo.new(1.5), {ImageTransparency = 0.3}):Play()
-
 task.wait(3)
 
 TweenService:Create(blur, TweenInfo.new(1.5), {Size = 0}):Play()
 TweenService:Create(customOverlay, TweenInfo.new(1.5), {ImageTransparency = 1}):Play()
 TweenService:Create(splashSound, TweenInfo.new(1.5), {Volume = 0}):Play()
-
 task.wait(1.5)
-
 blur:Destroy()
 splashGui:Destroy()
 
+-- RIXHU WATERMARK BUTTON
 local gui = Instance.new("ScreenGui")
 gui.Name = "WatermarkGui"
 gui.ResetOnSpawn = false
 gui.IgnoreGuiInset = true
+gui.DisplayOrder = 9999
 gui.Parent = player:WaitForChild("PlayerGui")
 
 local textButton = Instance.new("TextButton")
@@ -63,28 +65,30 @@ textButton.ZIndex = 10
 textButton.Parent = gui
 
 local clickSound = Instance.new("Sound")
-clickSound.SoundId = "rbxassetid://7227567562" -- Replace with your sound asset ID here
+clickSound.SoundId = "rbxassetid://PUT_SOUND_ID_HERE" -- 🔊 Insert your sound ID here
 clickSound.Volume = 1
 clickSound.Parent = textButton
 
+local clicked = false
 textButton.MouseButton1Click:Connect(function()
-    -- Pop effect
-    local grow = TweenService:Create(textButton, TweenInfo.new(0.1), {Size = UDim2.new(0, 90, 0, 22)})
-    local shrink = TweenService:Create(textButton, TweenInfo.new(0.1), {Size = UDim2.new(0, 80, 0, 20)})
-    grow:Play()
-    grow.Completed:Wait()
-    shrink:Play()
+	if clicked then return end
+	clicked = true
 
-    local fade = TweenService:Create(textButton, TweenInfo.new(0.3), {
-        TextColor3 = Color3.new(1, 0, 0),
-        BackgroundTransparency = 0.6
-    })
-    fade:Play()
+	local grow = TweenService:Create(textButton, TweenInfo.new(0.1), {Size = UDim2.new(0, 90, 0, 22)})
+	local shrink = TweenService:Create(textButton, TweenInfo.new(0.1), {Size = UDim2.new(0, 80, 0, 20)})
+	grow:Play()
+	grow.Completed:Wait()
+	shrink:Play()
 
-    clickSound:Play()
-    clickSound.Ended:Wait()
+	local fade = TweenService:Create(textButton, TweenInfo.new(0.3), {
+		TextColor3 = Color3.new(1, 0, 0),
+		BackgroundTransparency = 0.6
+	})
+	fade:Play()
 
-    gui:Destroy()
+	clickSound:Play()
+	clickSound.Ended:Wait()
+	gui:Destroy()
 end)
 
 local SoundService = game:GetService("SoundService")
