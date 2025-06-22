@@ -43,6 +43,50 @@ task.wait(1.5)
 blur:Destroy()
 splashGui:Destroy()
 
+local gui = Instance.new("ScreenGui")
+gui.Name = "WatermarkGui"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local textButton = Instance.new("TextButton")
+textButton.Name = "RIXHU_Watermark"
+textButton.Text = "RIXHU"
+textButton.FontFace = Font.new("rbxasset://fonts/families/DenkOne.json")
+textButton.TextSize = 14
+textButton.TextColor3 = Color3.new(1, 1, 1)
+textButton.BackgroundTransparency = 1
+textButton.Position = UDim2.new(1, -100, 1, -30)
+textButton.Size = UDim2.new(0, 80, 0, 20)
+textButton.AnchorPoint = Vector2.new(1, 1)
+textButton.ZIndex = 10
+textButton.Parent = gui
+
+local clickSound = Instance.new("Sound")
+clickSound.SoundId = "rbxassetid://7227567562" -- Replace with your sound asset ID here
+clickSound.Volume = 1
+clickSound.Parent = textButton
+
+textButton.MouseButton1Click:Connect(function()
+    -- Pop effect
+    local grow = TweenService:Create(textButton, TweenInfo.new(0.1), {Size = UDim2.new(0, 90, 0, 22)})
+    local shrink = TweenService:Create(textButton, TweenInfo.new(0.1), {Size = UDim2.new(0, 80, 0, 20)})
+    grow:Play()
+    grow.Completed:Wait()
+    shrink:Play()
+
+    local fade = TweenService:Create(textButton, TweenInfo.new(0.3), {
+        TextColor3 = Color3.new(1, 0, 0),
+        BackgroundTransparency = 0.6
+    })
+    fade:Play()
+
+    clickSound:Play()
+    clickSound.Ended:Wait()
+
+    gui:Destroy()
+end)
+
 local SoundService = game:GetService("SoundService")
 local introSound = Instance.new("Sound")
 introSound.SoundId = "rbxassetid://5797595098"
@@ -1165,71 +1209,3 @@ button2.MouseButton1Click:Connect(function()
 	fadeOutAll()
 	runScript2()
 end)
-
-
--- ▼▼▼ RIXHU Watermark Inject ▼▼▼
---[[
-💧 RIXHU Watermark Script 💧
-Displays a small watermark near the chat box that plays a sound, animates, and self-destroys after click.
-Replace SOUND_ASSET_ID below with your sound asset ID.
---]]
-
-local TweenService = game:GetService("TweenService")
-local SoundService = game:GetService("SoundService")
-local CoreGui = game:GetService("CoreGui")
-local Players = game:GetService("Players")
-
-local watermarkGui = Instance.new("ScreenGui")
-watermarkGui.Name = "RIXHU_Watermark"
-watermarkGui.ResetOnSpawn = false
-watermarkGui.IgnoreGuiInset = true
-watermarkGui.Parent = CoreGui
-
-local button = Instance.new("TextButton")
-button.Size = UDim2.new(0, 80, 0, 25)
-button.Position = UDim2.new(1, -140, 1, -50)
-button.AnchorPoint = Vector2.new(0, 1)
-button.BackgroundTransparency = 0.5
-button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-button.Text = "RIXHU"
-button.Font = Font.new("rbxasset://fonts/families/DenkOne.json")
-button.TextColor3 = Color3.new(1, 1, 1)
-button.TextScaled = true
-button.Parent = watermarkGui
-
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 6)
-corner.Parent = button
-
-local sound = Instance.new("Sound")
-sound.SoundId = "rbxassetid://7227567562"
-sound.Volume = 1
-sound.Looped = false
-sound.Parent = button
-
-local function playAndDestroy()
-	local popGrow = TweenService:Create(button, TweenInfo.new(0.1), {
-		Size = UDim2.new(0, 90, 0, 30),
-		BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-	})
-	local popShrink = TweenService:Create(button, TweenInfo.new(0.1), {
-		Size = UDim2.new(0, 80, 0, 25),
-		BackgroundColor3 = Color3.fromRGB(120, 0, 0)
-	})
-	local fadeOut = TweenService:Create(button, TweenInfo.new(1), {BackgroundTransparency = 1, TextTransparency = 1})
-
-	popGrow:Play()
-	popGrow.Completed:Wait()
-	popShrink:Play()
-
-	sound:Play()
-	sound.Ended:Wait()
-
-	fadeOut:Play()
-	fadeOut.Completed:Wait()
-	watermarkGui:Destroy()
-end
-
-button.MouseButton1Click:Connect(playAndDestroy)
-
--- ▲▲▲ RIXHU Watermark Inject ▲▲▲
