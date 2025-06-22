@@ -1,86 +1,47 @@
--- ✅ FINAL WORKING RIXHU WATERMARK CLOSE BUTTON SCRIPT
 
 local TweenService = game:GetService("TweenService")
-local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
 local Lighting = game:GetService("Lighting")
-local player = Players.LocalPlayer
 
--- 🎨 Blur
+local splashGui = Instance.new("ScreenGui")
+splashGui.IgnoreGuiInset = true
+splashGui.ResetOnSpawn = false
+splashGui.Name = "SplashGui"
+splashGui.Parent = CoreGui
+
 local blur = Instance.new("BlurEffect")
 blur.Size = 24
 blur.Parent = Lighting
 
--- 🌊 Splash GUI
-local splashGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
-splashGui.IgnoreGuiInset = true
-splashGui.ResetOnSpawn = false
-splashGui.Name = "SplashGui"
+local customOverlay = Instance.new("ImageLabel")
+customOverlay.Size = UDim2.new(1, 0, 1, 0)
+customOverlay.BackgroundTransparency = 1
+customOverlay.Image = "rbxassetid://85939232985945"
+customOverlay.ImageTransparency = 0.75
+customOverlay.ScaleType = Enum.ScaleType.Stretch
+customOverlay.ZIndex = 1
+customOverlay.Parent = splashGui
 
-local splashOverlay = Instance.new("ImageLabel", splashGui)
-splashOverlay.Size = UDim2.new(1, 0, 1, 0)
-splashOverlay.Image = "rbxassetid://85939232985945"
-splashOverlay.ImageTransparency = 0.3
-splashOverlay.BackgroundTransparency = 1
-splashOverlay.ScaleType = Enum.ScaleType.Stretch
+local splashSound = Instance.new("Sound")
+splashSound.SoundId = "rbxassetid://9072301639"
+splashSound.Volume = 1
+splashSound.Looped = false
+splashSound.Parent = splashGui
+splashSound:Play()
 
-wait(3)
+TweenService:Create(blur, TweenInfo.new(1.5), {Size = 24}):Play()
+TweenService:Create(customOverlay, TweenInfo.new(1.5), {ImageTransparency = 0.3}):Play()
+
+task.wait(3)
+
+TweenService:Create(blur, TweenInfo.new(1.5), {Size = 0}):Play()
+TweenService:Create(customOverlay, TweenInfo.new(1.5), {ImageTransparency = 1}):Play()
+TweenService:Create(splashSound, TweenInfo.new(1.5), {Volume = 0}):Play()
+
+task.wait(1.5)
+
 blur:Destroy()
 splashGui:Destroy()
-
--- 🖼️ Watermark GUI
-local wmGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
-wmGui.IgnoreGuiInset = true
-wmGui.ResetOnSpawn = false
-wmGui.Name = "RIXHU_WatermarkGui"
-wmGui.DisplayOrder = 9999
-
-local button = Instance.new("TextButton", wmGui)
-button.Text = "RIXHU"
-button.FontFace = Font.new("rbxasset://fonts/families/DenkOne.json")
-button.TextSize = 14
-button.TextColor3 = Color3.new(1, 1, 1)
-button.BackgroundTransparency = 1
-button.Position = UDim2.new(1, -100, 1, -30)
-button.Size = UDim2.new(0, 80, 0, 20)
-button.AnchorPoint = Vector2.new(1, 1)
-
-local popImage = Instance.new("ImageLabel", wmGui)
-popImage.Size = UDim2.new(0, 20, 0, 20)
-popImage.Position = button.Position
-popImage.AnchorPoint = Vector2.new(1, 1)
-popImage.BackgroundTransparency = 1
-popImage.ImageTransparency = 1
-popImage.Image = "rbxassetid://120747791723554"
-popImage.ZIndex = 8
-
-local sound = Instance.new("Sound", button)
-sound.SoundId = "rbxassetid://7227567562" -- replace with real sound
-sound.Volume = 1
-
--- 🧨 Destruction logic
-local function destroyEverything()
-	for _, gui in ipairs(player.PlayerGui:GetChildren()) do
-		if gui:IsA("ScreenGui") and gui.Name ~= "Chat" then
-			pcall(function() gui:Destroy() end)
-		end
-	end
-	for _, effect in ipairs(Lighting:GetChildren()) do
-		if effect:IsA("BlurEffect") then effect:Destroy() end
-	end
-	pcall(function() script:Destroy() end)
-end
-
--- 🖱️ Click logic
-button.MouseButton1Click:Connect(function()
-	if popImage.ImageTransparency == 0 then return end
-	popImage.ImageTransparency = 0.2
-	TweenService:Create(popImage, TweenInfo.new(0.25), {
-		Size = UDim2.new(0, 50, 0, 50)
-	}):Play()
-	sound:Play()
-	sound.Ended:Wait()
-	destroyEverything()
-end)
 
 local SoundService = game:GetService("SoundService")
 local introSound = Instance.new("Sound")
@@ -965,18 +926,18 @@ local letters = {
     ["b"] = "🇧 ",
     ["C"] = "🇨 ",
     ["c"] = "🇨 ",
-    ["D"] = "🇩",
-    ["d"] = "🇩",
+    ["D"] = "🇩 ",
+    ["d"] = "🇩 ",
     ["E"] = "🇪 ",
     ["e"] = "🇪 ",
     ["F"] = "🇫 ",
     ["f"] = "🇫 ",
     ["G"] = "🇬 ",
     ["g"] = "🇬 ",
-    ["H"] = "🇭",
-    ["h"] = "🇭",
-    ["I"] = "🇮",
-    ["i"] = "🇮",
+    ["H"] = "🇭 ",
+    ["h"] = "🇭 ",
+    ["I"] = "🇮 ",
+    ["i"] = "🇮 ",
     ["J"] = "🇯 ",
     ["j"] = "🇯 ",
     ["K"] = "🇰 ",
@@ -995,8 +956,8 @@ local letters = {
     ["q"] = "🇶 ",
     ["R"] = "🇷 ",
     ["r"] = "🇷 ",
-    ["S"] = "🇸",
-    ["s"] = "🇸",
+    ["S"] = "🇸 ",
+    ["s"] = "🇸 ",
     ["T"] = "🇹 ",
     ["t"] = "🇹 ",
     ["U"] = "🇺 ",
