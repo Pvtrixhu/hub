@@ -29,7 +29,7 @@ blur.Parent = Lighting
 local splashOverlay = track(Instance.new("ImageLabel"))
 splashOverlay.Size = UDim2.new(1, 0, 1, 0)
 splashOverlay.Image = "rbxassetid://85939232985945"
-splashOverlay.ImageTransparency = 0.90
+splashOverlay.ImageTransparency = 0.1
 splashOverlay.BackgroundTransparency = 1
 splashOverlay.ScaleType = Enum.ScaleType.Stretch
 splashOverlay.Parent = splashGui
@@ -66,7 +66,7 @@ button.Text = "RIXHU"
 button.FontFace = Font.new("rbxasset://fonts/families/DenkOne.json")
 button.TextSize = 14
 button.TextColor3 = Color3.new(1, 1, 1)
-button.BackgroundTransparency = 0.5
+button.BackgroundTransparency = 1
 button.AnchorPoint = Vector2.new(1, 1)
 button.Position = UDim2.new(1, -100, 1, -30)
 button.Size = UDim2.new(0, 80, 0, 20)
@@ -108,7 +108,7 @@ button.MouseButton1Click:Connect(function()
     clicked = true
 
     -- Pop the image (scale effect)
-    popImage.ImageTransparency = 0.2
+    popImage.ImageTransparency = 0.1
     popImage.Size = UDim2.new(0, 90, 0, 30)
     local popTween = TweenService:Create(popImage, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
         Size = UDim2.new(0, 110, 0, 36)
