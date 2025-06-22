@@ -1,3 +1,5 @@
+-- RIXHU Watermark with Close-Button Behavior and Image Pop Effect
+
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
 local Lighting = game:GetService("Lighting")
@@ -5,115 +7,117 @@ local Players = game:GetService("Players")
 local SoundService = game:GetService("SoundService")
 local player = Players.LocalPlayer
 
--- 🔧 Track created instances
-local createdInstances = {}
-local function track(inst)
-	table.insert(createdInstances, inst)
-	return inst
+-- Track everything to fully destroy on click
+local created = {}
+
+local function track(instance)
+    table.insert(created, instance)
+    return instance
 end
 
--- 🌊 Splash GUI
+-- SPLASH GUI
 local splashGui = track(Instance.new("ScreenGui"))
+splashGui.Name = "SplashGui"
 splashGui.IgnoreGuiInset = true
 splashGui.ResetOnSpawn = false
-splashGui.Name = "SplashGui"
 splashGui.Parent = CoreGui
 
 local blur = track(Instance.new("BlurEffect"))
 blur.Size = 24
 blur.Parent = Lighting
 
-local overlay = track(Instance.new("ImageLabel"))
-overlay.Size = UDim2.new(1, 0, 1, 0)
-overlay.BackgroundTransparency = 1
-overlay.Image = "rbxassetid://85939232985945"
-overlay.ImageTransparency = 0.75
-overlay.ScaleType = Enum.ScaleType.Stretch
-overlay.ZIndex = 1
-overlay.Parent = splashGui
+local splashOverlay = track(Instance.new("ImageLabel"))
+splashOverlay.Size = UDim2.new(1, 0, 1, 0)
+splashOverlay.Image = "rbxassetid://85939232985945"
+splashOverlay.ImageTransparency = 0.90
+splashOverlay.BackgroundTransparency = 1
+splashOverlay.ScaleType = Enum.ScaleType.Stretch
+splashOverlay.Parent = splashGui
 
 local splashSound = track(Instance.new("Sound"))
 splashSound.SoundId = "rbxassetid://9072301639"
 splashSound.Volume = 1
-splashSound.Looped = false
 splashSound.Parent = splashGui
 splashSound:Play()
 
 TweenService:Create(blur, TweenInfo.new(1.5), {Size = 24}):Play()
-TweenService:Create(overlay, TweenInfo.new(1.5), {ImageTransparency = 0.3}):Play()
+TweenService:Create(splashOverlay, TweenInfo.new(1.5), {ImageTransparency = 0.3}):Play()
 task.wait(3)
+
 TweenService:Create(blur, TweenInfo.new(1.5), {Size = 0}):Play()
-TweenService:Create(overlay, TweenInfo.new(1.5), {ImageTransparency = 1}):Play()
+TweenService:Create(splashOverlay, TweenInfo.new(1.5), {ImageTransparency = 1}):Play()
 TweenService:Create(splashSound, TweenInfo.new(1.5), {Volume = 0}):Play()
 task.wait(1.5)
 
 pcall(function() splashGui:Destroy() end)
 pcall(function() blur:Destroy() end)
 
--- 💧 Watermark GUI
+-- WATERMARK GUI
 local wmGui = track(Instance.new("ScreenGui"))
 wmGui.Name = "WatermarkGui"
-wmGui.ResetOnSpawn = false
 wmGui.IgnoreGuiInset = true
+wmGui.ResetOnSpawn = false
 wmGui.DisplayOrder = 9999
 wmGui.Parent = player:WaitForChild("PlayerGui")
 
-local wmButton = track(Instance.new("TextButton"))
-wmButton.Name = "RIXHU_Watermark"
-wmButton.Text = "RIXHU"
-wmButton.FontFace = Font.new("rbxasset://fonts/families/DenkOne.json")
-wmButton.TextSize = 14
-wmButton.TextColor3 = Color3.new(1, 1, 1)
-wmButton.BackgroundTransparency = 1
-wmButton.Position = UDim2.new(1, -100, 1, -30)
-wmButton.Size = UDim2.new(0, 80, 0, 20)
-wmButton.AnchorPoint = Vector2.new(1, 1)
-wmButton.ZIndex = 10
-wmButton.Parent = wmGui
+local button = track(Instance.new("TextButton"))
+button.Name = "RIXHU_Button"
+button.Text = "RIXHU"
+button.FontFace = Font.new("rbxasset://fonts/families/DenkOne.json")
+button.TextSize = 14
+button.TextColor3 = Color3.new(1, 1, 1)
+button.BackgroundTransparency = 0.5
+button.AnchorPoint = Vector2.new(1, 1)
+button.Position = UDim2.new(1, -100, 1, -30)
+button.Size = UDim2.new(0, 80, 0, 20)
+button.ZIndex = 10
+button.Parent = wmGui
 
-local clickSound = track(Instance.new("Sound"))
-clickSound.SoundId = "rbxassetid://7227567562" -- 🔊 INSERT YOUR SOUND ID
-clickSound.Volume = 1
-clickSound.Parent = wmButton
+-- Pop image effect
+local popImage = track(Instance.new("ImageLabel"))
+popImage.Size = UDim2.new(0, 90, 0, 30)
+popImage.Position = UDim2.new(1, -105, 1, -35)
+popImage.AnchorPoint = Vector2.new(1, 1)
+popImage.BackgroundTransparency = 1
+popImage.ImageTransparency = 1 -- Start invisible
+popImage.Image = "rbxassetid://120747791723554" -- Any highlight image
+popImage.ZIndex = 9
+popImage.ScaleType = Enum.ScaleType.Fit
+popImage.Parent = wmGui
 
--- 🧨 Self-destroy function
-local function fullDestroy()
-	for _, obj in pairs(createdInstances) do
-		if obj and obj.Destroy then
-			pcall(function() obj:Destroy() end)
-		end
-	end
+-- Click sound
+local sound = track(Instance.new("Sound"))
+sound.SoundId = "rbxassetid://7227567562" -- Replace with your sound asset ID
+sound.Volume = 1
+sound.Parent = button
 
-	-- OPTIONAL: Kill any connections or loops if you added them
-
-	-- 🔪 Destroy the script itself (works only if this code is in a LocalScript or ModuleScript)
-	if script and script:IsA("LocalScript") then
-		pcall(function() script:Destroy() end)
-	end
+-- Cleanup function
+local function nukeScript()
+    for _, obj in ipairs(created) do
+        pcall(function() obj:Destroy() end)
+    end
+    if script and script:IsA("LocalScript") then
+        pcall(function() script:Destroy() end)
+    end
 end
 
--- 💥 Watermark button click logic
+-- Click logic
 local clicked = false
-wmButton.MouseButton1Click:Connect(function()
-	if clicked then return end
-	clicked = true
+button.MouseButton1Click:Connect(function()
+    if clicked then return end
+    clicked = true
 
-	local grow = TweenService:Create(wmButton, TweenInfo.new(0.1), {Size = UDim2.new(0, 90, 0, 22)})
-	local shrink = TweenService:Create(wmButton, TweenInfo.new(0.1), {Size = UDim2.new(0, 80, 0, 20)})
-	grow:Play()
-	grow.Completed:Wait()
-	shrink:Play()
+    -- Pop the image (scale effect)
+    popImage.ImageTransparency = 0.2
+    popImage.Size = UDim2.new(0, 90, 0, 30)
+    local popTween = TweenService:Create(popImage, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+        Size = UDim2.new(0, 110, 0, 36)
+    })
+    popTween:Play()
 
-	local fade = TweenService:Create(wmButton, TweenInfo.new(0.3), {
-		TextColor3 = Color3.new(1, 0, 0),
-		BackgroundTransparency = 0.6
-	})
-	fade:Play()
-
-	clickSound:Play()
-	clickSound.Ended:Wait()
-
-	fullDestroy()
+    sound:Play()
+    sound.Ended:Wait()
+    nukeScript()
 end)
 
 local SoundService = game:GetService("SoundService")
