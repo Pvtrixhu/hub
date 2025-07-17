@@ -547,8 +547,8 @@ local function C_14()
     local UserInputService = game:GetService("UserInputService")
 
     -- === CONFIG ===
-    local minimizedIconId = "rbxassetid://126304785780754" -- 🌀 Replace with your minimized icon
-    local clickSoundId = "rbxassetid://70658084432373" -- 🔊 Replace with your sound
+    local minimizedIconId = "rbxassetid://1234567891" -- 🌀 Replace with your minimized icon
+    local clickSoundId = "rbxassetid://1234567892" -- 🔊 Replace with your sound
     -- ===============
 
     -- Sound
