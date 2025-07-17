@@ -546,8 +546,8 @@ local function C_14()
     local UserInputService = game:GetService("UserInputService")
 
     -- === CONFIG ===
-    local minimizedIconId = "rbxassetid://105086894272111" -- 🌀 Your custom minimized icon
-    local clickSoundId = "rbxassetid://7227567562"    -- 🔊 Your click sound
+    local minimizedIconId = "rbxassetid://84935017672596" -- 🌀 Replace with your minimized icon
+    local clickSoundId = "rbxassetid://7227567562" -- 🔊 Replace with your sound
     -- ===============
 
     -- Sound
@@ -555,22 +555,13 @@ local function C_14()
     sound.SoundId = clickSoundId
     sound.Volume = 1
 
-    -- Create transparent button overlay for minimized frame
-    local restoreButton = Instance.new("ImageButton")
-    restoreButton.BackgroundTransparency = 1
-    restoreButton.Size = UDim2.new(1, 0, 1, 0)
-    restoreButton.Position = UDim2.new(0, 0, 0, 0)
-    restoreButton.Visible = false
-    restoreButton.ZIndex = 100
-    restoreButton.Name = "RestoreButton"
-    restoreButton.Parent = main
-
-    -- Dragging logic
-    local dragging, dragInput, dragStart, startPos
+    -- Dragging support
+    local dragging = false
+    local dragInput, dragStart, startPos
     local function update(input)
         local delta = input.Position - dragStart
         main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
-                                  startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+                                   startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
     main.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -595,7 +586,7 @@ local function C_14()
         end
     end)
 
-    -- Special ImageLabel (background graphic)
+    -- Special ImageLabel
     local specialImage
     for _, child in ipairs(main:GetDescendants()) do
         if child:IsA("ImageLabel") and child.Image == "rbxassetid://106628123920796" then
@@ -604,7 +595,7 @@ local function C_14()
         end
     end
 
-    -- UI children to toggle
+    -- Content to toggle
     local contentToToggle = {}
     for _, child in ipairs(main:GetDescendants()) do
         if (child:IsA("TextBox") or child:IsA("TextButton") or child:IsA("TextLabel")) and child ~= button then
@@ -616,20 +607,33 @@ local function C_14()
     local originalColor = main.BackgroundColor3
     local originalImage = specialImage and specialImage.Image
 
+    -- Transparent button for restore
+    local restoreButton = Instance.new("TextButton")
+    restoreButton.BackgroundTransparency = 1
+    restoreButton.Size = UDim2.new(1, 0, 1, 0)
+    restoreButton.Position = UDim2.new(0, 0, 0, 0)
+    restoreButton.Text = ""
+    restoreButton.Visible = false
+    restoreButton.ZIndex = 99
+    restoreButton.Parent = main
+
     local function minimize()
         minimized = true
         sound:Play()
+
+        -- Hide all contents
         for _, ui in ipairs(contentToToggle) do ui.Visible = false end
         button.Visible = false
-        restoreButton.Visible = true
 
         if specialImage then
             specialImage.Image = minimizedIconId
             specialImage.Size = UDim2.new(1, 0, 1, 0)
             specialImage.Position = UDim2.new(0, 0, 0, 0)
-            specialImage.ZIndex = 99
+            specialImage.ZIndex = 98
             specialImage.Visible = true
         end
+
+        restoreButton.Visible = true
 
         TweenService:Create(main, TweenInfo.new(0.3, Enum.EasingStyle.Sine), {
             Size = UDim2.new(0, 60, 0, 60),
@@ -640,7 +644,9 @@ local function C_14()
     local function maximize()
         minimized = false
         sound:Play()
+
         restoreButton.Visible = false
+        button.Visible = true
 
         TweenService:Create(main, TweenInfo.new(0.3, Enum.EasingStyle.Sine), {
             Size = originalSize,
@@ -649,7 +655,6 @@ local function C_14()
 
         task.delay(0.3, function()
             for _, ui in ipairs(contentToToggle) do ui.Visible = true end
-            button.Visible = true
             if specialImage then
                 specialImage.Image = originalImage
                 specialImage.Size = UDim2.new(0, 316, 0, 128)
