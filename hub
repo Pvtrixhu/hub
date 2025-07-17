@@ -156,13 +156,6 @@ end
 StartupSound.Ended:Connect(function()
     fadeOutSound(StartupSound, 2) -- 2 seconds fade out
 end)
-local NotificationHolder = loadstring(game:HttpGet("https://raw.githubusercontent.com/BocusLuke/UI/main/STX/Module.Lua"))()
-local Notification = loadstring(game:HttpGet("https://raw.githubusercontent.com/BocusLuke/UI/main/STX/Client.Lua"))()
-    Notification:Notify(
-       {Title = "By Father Rixhu, Insta ID ~ Pvtrixhu", Description = "Font Provided By Limo, youtube~ LuvLimo2"},
-       {OutlineColor = Color3.fromRGB(0, 0, 0), Time = 8, Type = "default"}
-    )
-
 local G2L = {}
 G2L["1"] = Instance.new("ScreenGui", game:GetService("CoreGui"));
 G2L["2"] = Instance.new("Frame", G2L["1"])
@@ -474,9 +467,7 @@ local letters = {
         end
         return message
     end
-    local function showNotification(title, text)
-        StarterGui:SetCore("SendNotification", {Title = title, Text = text, Duration = 5})
-    end
+   
     local function sendChat(msg)
     local filteredMessage = game:GetService("Chat"):FilterStringForBroadcast(msg, LocalPlayer)
     local tagged = filteredMessage ~= msg
@@ -491,10 +482,6 @@ local letters = {
         msg = startChar .. msg .. endChar
     end
 
-    if tagged then
-        showNotification("HELL NAH !!", "TEXT FUCKED")
-        textBox.Text = ""
-    else
         if TextChatService.ChatVersion == Enum.ChatVersion.LegacyChatService then
             ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents").SayMessageRequest:FireServer(msg, "All")
         else
