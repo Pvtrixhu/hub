@@ -537,6 +537,7 @@ local function C_11()
     button.MouseButton1Click:Connect(toggleVisibility)
 end
 task.spawn(C_11)
+-- Final Fixed Minimize UI with Drag, Restore, ImageLabel, and Rounded Edges
 local function C_14()
     local script = G2L["14"]
     local main = script.Parent.Parent
@@ -546,8 +547,8 @@ local function C_14()
     local UserInputService = game:GetService("UserInputService")
 
     -- === CONFIG ===
-    local minimizedIconId = "rbxassetid://84935017672596" -- 🌀 Replace with your minimized icon
-    local clickSoundId = "rbxassetid://7227567562" -- 🔊 Replace with your sound
+    local minimizedIconId = "rbxassetid://126304785780754" -- 🌀 Replace with your minimized icon
+    local clickSoundId = "rbxassetid://70658084432373" -- 🔊 Replace with your sound
     -- ===============
 
     -- Sound
@@ -595,6 +596,10 @@ local function C_14()
         end
     end
 
+    local specialCorner = Instance.new("UICorner")
+    specialCorner.CornerRadius = UDim.new(1, 0)
+    specialCorner.Parent = specialImage
+
     -- Content to toggle
     local contentToToggle = {}
     for _, child in ipairs(main:GetDescendants()) do
@@ -606,8 +611,9 @@ local function C_14()
     local originalSize = main.Size
     local originalColor = main.BackgroundColor3
     local originalImage = specialImage and specialImage.Image
+    local originalCorner = specialImage:FindFirstChildOfClass("UICorner") and specialImage:FindFirstChildOfClass("UICorner").CornerRadius
 
-    -- Transparent button for restore
+    -- Transparent restore button
     local restoreButton = Instance.new("TextButton")
     restoreButton.BackgroundTransparency = 1
     restoreButton.Size = UDim2.new(1, 0, 1, 0)
@@ -621,7 +627,6 @@ local function C_14()
         minimized = true
         sound:Play()
 
-        -- Hide all contents
         for _, ui in ipairs(contentToToggle) do ui.Visible = false end
         button.Visible = false
 
@@ -631,6 +636,7 @@ local function C_14()
             specialImage.Position = UDim2.new(0, 0, 0, 0)
             specialImage.ZIndex = 98
             specialImage.Visible = true
+            specialImage:FindFirstChildOfClass("UICorner").CornerRadius = UDim.new(1, 0) -- Round when minimized
         end
 
         restoreButton.Visible = true
@@ -659,6 +665,7 @@ local function C_14()
                 specialImage.Image = originalImage
                 specialImage.Size = UDim2.new(0, 316, 0, 128)
                 specialImage.Position = UDim2.new(0, 0, 0, 0)
+                specialImage:FindFirstChildOfClass("UICorner").CornerRadius = originalCorner or UDim.new(0, 4)
             end
         end)
     end
