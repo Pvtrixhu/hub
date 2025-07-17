@@ -537,121 +537,41 @@ local function C_11()
     button.MouseButton1Click:Connect(toggleVisibility)
 end
 task.spawn(C_11)
--- Minimize UI Script with Dragging Support While Minimized
 local function C_14()
     local script = G2L["14"]
-    local main = script.Parent.Parent -- The Frame
+    local main = script.Parent.Parent
     local button = script.Parent
     local minimized = false
-    local tweenService = game:GetService("TweenService")
-    local userInputService = game:GetService("UserInputService")
+    local TweenService = game:GetService("TweenService")
+    local UserInputService = game:GetService("UserInputService")
 
-    -- === CONFIG (change these IDs to yours) ===
-    local minimizedIconId = "rbxassetid://105086894272111" -- 🌀 Minimized square icon (change this)
-    local clickSoundId = "rbxassetid://7227567562" -- 🔊 Click sound effect (change this)
-    -- ==========================================
+    -- === CONFIG ===
+    local minimizedIconId = "rbxassetid://105086894272111" -- 🌀 Your custom minimized icon
+    local clickSoundId = "rbxassetid://7227567562"    -- 🔊 Your click sound
+    -- ===============
 
-    -- Create Sound
+    -- Sound
     local sound = Instance.new("Sound", button)
     sound.SoundId = clickSoundId
     sound.Volume = 1
 
-    -- Pop animation
-    local function playPopAnimation(ui)
-        local originalSize = ui.Size
-        local pop = tweenService:Create(ui, TweenInfo.new(0.15, Enum.EasingStyle.Back), {
-            Size = originalSize + UDim2.new(0, 5, 0, 5)
-        })
-        local shrink = tweenService:Create(ui, TweenInfo.new(0.15, Enum.EasingStyle.Back), {
-            Size = originalSize
-        })
-        pop:Play()
-        pop.Completed:Connect(function()
-            shrink:Play()
-        end)
-    end
+    -- Create transparent button overlay for minimized frame
+    local restoreButton = Instance.new("ImageButton")
+    restoreButton.BackgroundTransparency = 1
+    restoreButton.Size = UDim2.new(1, 0, 1, 0)
+    restoreButton.Position = UDim2.new(0, 0, 0, 0)
+    restoreButton.Visible = false
+    restoreButton.ZIndex = 100
+    restoreButton.Name = "RestoreButton"
+    restoreButton.Parent = main
 
-    -- Find special image
-    local specialImage
-    for _, child in ipairs(main:GetDescendants()) do
-        if child:IsA("ImageLabel") and child.Image == "rbxassetid://106628123920796" then
-            specialImage = child
-            break
-        end
-    end
-
-    local contentToToggle = {}
-    for _, child in ipairs(main:GetDescendants()) do
-        if (child:IsA("TextBox") or child:IsA("TextButton") or child:IsA("TextLabel")) and child ~= button then
-            table.insert(contentToToggle, child)
-        end
-    end
-
-    local originalSize = main.Size
-    local originalColor = main.BackgroundColor3
-    local originalImage = specialImage and specialImage.Image
-    local originalButtonVisible = button.Visible
-
-    local function minimize()
-        minimized = true
-        sound:Play()
-        playPopAnimation(button)
-
-        for _, ui in ipairs(contentToToggle) do
-            ui.Visible = false
-        end
-        button.Visible = false
-
-        if specialImage then
-            specialImage.Image = minimizedIconId
-            specialImage.Size = UDim2.new(1, 0, 1, 0)
-            specialImage.Position = UDim2.new(0, 0, 0, 0)
-            specialImage.Visible = true
-        end
-
-        local tween = tweenService:Create(main, TweenInfo.new(0.3, Enum.EasingStyle.Sine), {
-            Size = UDim2.new(0, 60, 0, 60),
-            BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-        })
-        tween:Play()
-    end
-
-    local function maximize()
-        minimized = false
-        sound:Play()
-        playPopAnimation(main)
-
-        local tween = tweenService:Create(main, TweenInfo.new(0.3, Enum.EasingStyle.Sine), {
-            Size = originalSize,
-            BackgroundColor3 = originalColor
-        })
-        tween:Play()
-
-        tween.Completed:Connect(function()
-            for _, ui in ipairs(contentToToggle) do
-                ui.Visible = true
-            end
-            button.Visible = originalButtonVisible
-
-            if specialImage then
-                specialImage.Image = originalImage
-                specialImage.Size = UDim2.new(0, 316, 0, 128)
-                specialImage.Position = UDim2.new(0, 0, 0, 0)
-            end
-        end)
-    end
-
-    button.MouseButton1Click:Connect(minimize)
-
-    -- Dragging logic (works even when minimized)
-    local dragging = false
-    local dragInput, dragStart, startPos
-
+    -- Dragging logic
+    local dragging, dragInput, dragStart, startPos
     local function update(input)
         local delta = input.Position - dragStart
-        main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+                                  startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
-
     main.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
@@ -664,25 +584,82 @@ local function C_14()
             end)
         end
     end)
-
     main.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
             dragInput = input
         end
     end)
-
-    userInputService.InputChanged:Connect(function(input)
+    UserInputService.InputChanged:Connect(function(input)
         if input == dragInput and dragging then
             update(input)
         end
     end)
 
-    -- Restore on click when minimized (click anywhere on frame)
-    main.MouseButton1Click:Connect(function()
-        if minimized then
-            maximize()
+    -- Special ImageLabel (background graphic)
+    local specialImage
+    for _, child in ipairs(main:GetDescendants()) do
+        if child:IsA("ImageLabel") and child.Image == "rbxassetid://106628123920796" then
+            specialImage = child
+            break
         end
-    end)
+    end
+
+    -- UI children to toggle
+    local contentToToggle = {}
+    for _, child in ipairs(main:GetDescendants()) do
+        if (child:IsA("TextBox") or child:IsA("TextButton") or child:IsA("TextLabel")) and child ~= button then
+            table.insert(contentToToggle, child)
+        end
+    end
+
+    local originalSize = main.Size
+    local originalColor = main.BackgroundColor3
+    local originalImage = specialImage and specialImage.Image
+
+    local function minimize()
+        minimized = true
+        sound:Play()
+        for _, ui in ipairs(contentToToggle) do ui.Visible = false end
+        button.Visible = false
+        restoreButton.Visible = true
+
+        if specialImage then
+            specialImage.Image = minimizedIconId
+            specialImage.Size = UDim2.new(1, 0, 1, 0)
+            specialImage.Position = UDim2.new(0, 0, 0, 0)
+            specialImage.ZIndex = 99
+            specialImage.Visible = true
+        end
+
+        TweenService:Create(main, TweenInfo.new(0.3, Enum.EasingStyle.Sine), {
+            Size = UDim2.new(0, 60, 0, 60),
+            BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        }):Play()
+    end
+
+    local function maximize()
+        minimized = false
+        sound:Play()
+        restoreButton.Visible = false
+
+        TweenService:Create(main, TweenInfo.new(0.3, Enum.EasingStyle.Sine), {
+            Size = originalSize,
+            BackgroundColor3 = originalColor
+        }):Play()
+
+        task.delay(0.3, function()
+            for _, ui in ipairs(contentToToggle) do ui.Visible = true end
+            button.Visible = true
+            if specialImage then
+                specialImage.Image = originalImage
+                specialImage.Size = UDim2.new(0, 316, 0, 128)
+                specialImage.Position = UDim2.new(0, 0, 0, 0)
+            end
+        end)
+    end
+
+    button.MouseButton1Click:Connect(minimize)
+    restoreButton.MouseButton1Click:Connect(maximize)
 end
 
 task.spawn(C_14)
