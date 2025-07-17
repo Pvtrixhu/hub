@@ -537,67 +537,24 @@ local function C_11()
     button.MouseButton1Click:Connect(toggleVisibility)
 end
 task.spawn(C_11)
--- Minimize and Divine Effect UI Script
+-- Minimize UI Script with Dragging Support While Minimized
 local function C_14()
     local script = G2L["14"]
     local main = script.Parent.Parent -- The Frame
     local button = script.Parent
     local minimized = false
     local tweenService = game:GetService("TweenService")
-    local runService = game:GetService("RunService")
+    local userInputService = game:GetService("UserInputService")
 
     -- === CONFIG (change these IDs to yours) ===
-    local divineImageId = "rbxassetid://105086894272111" -- 🌟 Divine effect image (change this)
-    local minimizedIconId = "rbxassetid://84935017672596" -- 🌀 Minimized square icon (change this)
+    local minimizedIconId = "rbxassetid://105086894272111" -- 🌀 Minimized square icon (change this)
     local clickSoundId = "rbxassetid://7227567562" -- 🔊 Click sound effect (change this)
-    local glowIconId = "rbxassetid://105086894272111" -- ✨ Glow icon that replaces button during minimized
     -- ==========================================
 
     -- Create Sound
     local sound = Instance.new("Sound", button)
     sound.SoundId = clickSoundId
     sound.Volume = 1
-
-    -- Create Divine Effect
-    local divineImage = Instance.new("ImageLabel")
-    divineImage.Size = UDim2.new(0, 60, 0, 60)
-    divineImage.Position = UDim2.new(0.5, -30, 0.5, -30)
-    divineImage.Image = divineImageId
-    divineImage.BackgroundTransparency = 1
-    divineImage.Visible = false
-    divineImage.ZIndex = 0
-    divineImage.Name = "DivineEffect"
-    divineImage.Parent = main
-
-    local divineCorner = Instance.new("UICorner")
-    divineCorner.CornerRadius = UDim.new(1, 0)
-    divineCorner.Parent = divineImage
-
-    -- Create Glow ImageButton (acts as the clickable minimized icon)
-    local glowImage = Instance.new("ImageButton")
-    glowImage.Size = UDim2.new(0, 60, 0, 60)
-    glowImage.Position = UDim2.new(0.5, -30, 0.5, -30)
-    glowImage.Image = glowIconId
-    glowImage.BackgroundTransparency = 1
-    glowImage.Visible = false
-    glowImage.ZIndex = 10
-    glowImage.Name = "GlowRestore"
-    glowImage.Parent = main
-
-    local glowCorner = Instance.new("UICorner")
-    glowCorner.CornerRadius = UDim.new(1, 0)
-    glowCorner.Parent = glowImage
-
-    -- Rotation logic
-    local rotationConnection
-    local function startRotation()
-        rotationConnection = runService.RenderStepped:Connect(function()
-            divineImage.Rotation = (divineImage.Rotation + 1) % 360
-        end)
-    end
-    local function stopRotation()
-        if rotationConnection then rotationConnection:Disconnect() end
-    end
 
     -- Pop animation
     local function playPopAnimation(ui)
@@ -625,7 +582,7 @@ local function C_14()
 
     local contentToToggle = {}
     for _, child in ipairs(main:GetDescendants()) do
-        if (child:IsA("TextBox") or child:IsA("TextButton") or child:IsA("TextLabel")) and child ~= button and child ~= glowImage then
+        if (child:IsA("TextBox") or child:IsA("TextButton") or child:IsA("TextLabel")) and child ~= button then
             table.insert(contentToToggle, child)
         end
     end
@@ -657,18 +614,12 @@ local function C_14()
             BackgroundColor3 = Color3.fromRGB(0, 0, 0)
         })
         tween:Play()
-
-        glowImage.Visible = true
-        divineImage.Visible = true
-        startRotation()
     end
 
     local function maximize()
         minimized = false
         sound:Play()
-        playPopAnimation(glowImage)
-
-        glowImage.Visible = false
+        playPopAnimation(main)
 
         local tween = tweenService:Create(main, TweenInfo.new(0.3, Enum.EasingStyle.Sine), {
             Size = originalSize,
@@ -688,13 +639,50 @@ local function C_14()
                 specialImage.Position = UDim2.new(0, 0, 0, 0)
             end
         end)
-
-        stopRotation()
-        divineImage.Visible = false
     end
 
     button.MouseButton1Click:Connect(minimize)
-    glowImage.MouseButton1Click:Connect(maximize)
+
+    -- Dragging logic (works even when minimized)
+    local dragging = false
+    local dragInput, dragStart, startPos
+
+    local function update(input)
+        local delta = input.Position - dragStart
+        main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+
+    main.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = main.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    main.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+
+    userInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            update(input)
+        end
+    end)
+
+    -- Restore on click when minimized (click anywhere on frame)
+    main.MouseButton1Click:Connect(function()
+        if minimized then
+            maximize()
+        end
+    end)
 end
 
 task.spawn(C_14)
