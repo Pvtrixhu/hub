@@ -485,12 +485,15 @@ local letters = {
     local keepTextCheckbox = script.Parent.Parent.Parent:FindFirstChild("KeepTextCheckbox")
     local keepTextTick = keepTextCheckbox and keepTextCheckbox:FindFirstChild("Tick")
 
-    -- Add special character only if checkbox is checked (tick is visible)
     if keepTextTick and keepTextTick.TextTransparency == 0 then
         local specialChars = {"★", "☠", "✿", "❖", "♡", "♬", "✓", "☾", "⚔", "⛧", "☢", "☯", "⚠", "♛", "⚡"}
         local startChar = specialChars[math.random(1, #specialChars)]
+        local midChar = specialChars[math.random(1, #specialChars)]
         local endChar = specialChars[math.random(1, #specialChars)]
-        msg = startChar .. msg .. endChar
+
+        -- Insert midChar into the middle of the message
+        local mid = math.floor(#msg / 2)
+        msg = startChar .. msg:sub(1, mid) .. midChar .. msg:sub(mid + 1) .. endChar
     end
 
     if tagged then
