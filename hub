@@ -623,9 +623,13 @@ local function C_14()
         playPopAnimation(button)
 
         if minimized then
-            for _, ui in ipairs(contentToToggle) do ui.Visible = false end
+            for _, ui in ipairs(contentToToggle) do
+                ui.Visible = false
+            end
             if specialImage then
                 specialImage.Image = minimizedIconId
+                specialImage.Size = UDim2.new(1, 0, 1, 0)
+                specialImage.Position = UDim2.new(0, 0, 0, 0)
                 specialImage.Visible = true
             end
             local tween = tweenService:Create(main, TweenInfo.new(0.3, Enum.EasingStyle.Sine), {
@@ -644,9 +648,13 @@ local function C_14()
             tween:Play()
 
             tween.Completed:Connect(function()
-                for _, ui in ipairs(contentToToggle) do ui.Visible = true end
+                for _, ui in ipairs(contentToToggle) do
+                    ui.Visible = true
+                end
                 if specialImage then
                     specialImage.Image = originalImage
+                    specialImage.Size = UDim2.new(0, 316, 0, 128)
+                    specialImage.Position = UDim2.new(0, 0, 0, 0)
                 end
             end)
 
