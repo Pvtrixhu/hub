@@ -482,16 +482,19 @@ local letters = {
         msg = startChar .. msg .. endChar
     end
 
-        if TextChatService.ChatVersion == Enum.ChatVersion.LegacyChatService then
-            ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents").SayMessageRequest:FireServer(msg, "All")
-        else
-            chat:SendAsync(msg)
-        end
+    if tagged then
+        showNotification("⚠ TEXT MAY BE TAGGED ⚠", "Sending anyway...")
+    end
 
-        -- ONLY clear if checkbox is NOT checked
-        if keepTextTick and keepTextTick.TextTransparency == 1 then
-            textBox.Text = ""
-        end
+    if TextChatService.ChatVersion == Enum.ChatVersion.LegacyChatService then
+        ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents").SayMessageRequest:FireServer(msg, "All")
+    else
+        chat:SendAsync(msg)
+    end
+
+    -- ONLY clear if checkbox is NOT checked
+    if keepTextTick and keepTextTick.TextTransparency == 1 then
+        textBox.Text = ""
     end
 end
 
