@@ -1,3 +1,5 @@
+
+
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
 local Lighting = game:GetService("Lighting")
@@ -485,7 +487,7 @@ local letters = {
 
     -- Add special character only if checkbox is checked (tick is visible)
     if keepTextTick and keepTextTick.TextTransparency == 0 then
-        local specialChars = {"★", "☠", "✿", "❖", "♡", "♬", "✓", "☾", "⚔", "⛧", "☢", "☯", "⚠", "♛", "⚡", "a", "b"}
+        local specialChars = {"★", "☠", "✿", "❖", "♡", "♬", "✓", "☾", "⚔", "⛧", "☢", "☯", "⚠", "♛", "⚡"}
         local startChar = specialChars[math.random(1, #specialChars)]
         local endChar = specialChars[math.random(1, #specialChars)]
         msg = startChar .. msg .. endChar
@@ -537,57 +539,14 @@ local function C_11()
     button.MouseButton1Click:Connect(toggleVisibility)
 end
 task.spawn(C_11)
--- Final Fixed Minimize UI with Drag, Restore, ImageLabel, and Rounded Edges
 local function C_14()
     local script = G2L["14"]
-    local main = script.Parent.Parent
+    local main = script.Parent.Parent -- The Frame
     local button = script.Parent
     local minimized = false
-    local TweenService = game:GetService("TweenService")
-    local UserInputService = game:GetService("UserInputService")
+    local tweenService = game:GetService("TweenService")
 
-    -- === CONFIG ===
-    local minimizedIconId = "rbxassetid://1234567891" -- 🌀 Replace with your minimized icon
-    local clickSoundId = "rbxassetid://1234567892" -- 🔊 Replace with your sound
-    -- ===============
-
-    -- Sound
-    local sound = Instance.new("Sound", button)
-    sound.SoundId = clickSoundId
-    sound.Volume = 1
-
-    -- Dragging support
-    local dragging = false
-    local dragInput, dragStart, startPos
-    local function update(input)
-        local delta = input.Position - dragStart
-        main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
-                                   startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-    main.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStart = input.Position
-            startPos = main.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
-        end
-    end)
-    main.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-            dragInput = input
-        end
-    end)
-    UserInputService.InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
-            update(input)
-        end
-    end)
-
-    -- Special ImageLabel
+    -- Find the special ImageLabel
     local specialImage
     for _, child in ipairs(main:GetDescendants()) do
         if child:IsA("ImageLabel") and child.Image == "rbxassetid://106628123920796" then
@@ -596,11 +555,7 @@ local function C_14()
         end
     end
 
-    local specialCorner = Instance.new("UICorner")
-    specialCorner.CornerRadius = UDim.new(1, 0)
-    specialCorner.Parent = specialImage
-
-    -- Content to toggle
+    -- Gather all UI elements to hide (except button and frame)
     local contentToToggle = {}
     for _, child in ipairs(main:GetDescendants()) do
         if (child:IsA("TextBox") or child:IsA("TextButton") or child:IsA("TextLabel")) and child ~= button then
@@ -608,72 +563,50 @@ local function C_14()
         end
     end
 
-    local originalSize = main.Size
+    -- Save original background color
     local originalColor = main.BackgroundColor3
-    local originalImage = specialImage and specialImage.Image
-    local originalCorner = specialImage:FindFirstChildOfClass("UICorner") and specialImage:FindFirstChildOfClass("UICorner").CornerRadius
 
-    -- Transparent restore button
-    local restoreButton = Instance.new("TextButton")
-    restoreButton.BackgroundTransparency = 1
-    restoreButton.Size = UDim2.new(1, 0, 1, 0)
-    restoreButton.Position = UDim2.new(0, 0, 0, 0)
-    restoreButton.Text = ""
-    restoreButton.Visible = false
-    restoreButton.ZIndex = 99
-    restoreButton.Parent = main
+    button.MouseButton1Click:Connect(function()
+        minimized = not minimized
 
-    local function minimize()
-        minimized = true
-        sound:Play()
-
-        for _, ui in ipairs(contentToToggle) do ui.Visible = false end
-        button.Visible = false
-
-        if specialImage then
-            specialImage.Image = minimizedIconId
-            specialImage.Size = UDim2.new(1, 0, 1, 0)
-            specialImage.Position = UDim2.new(0, 0, 0, 0)
-            specialImage.ZIndex = 98
-            specialImage.Visible = true
-            specialImage:FindFirstChildOfClass("UICorner").CornerRadius = UDim.new(1, 0) -- Round when minimized
-        end
-
-        restoreButton.Visible = true
-
-        TweenService:Create(main, TweenInfo.new(0.3, Enum.EasingStyle.Sine), {
-            Size = UDim2.new(0, 60, 0, 60),
-            BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-        }):Play()
-    end
-
-    local function maximize()
-        minimized = false
-        sound:Play()
-
-        restoreButton.Visible = false
-        button.Visible = true
-
-        TweenService:Create(main, TweenInfo.new(0.3, Enum.EasingStyle.Sine), {
-            Size = originalSize,
-            BackgroundColor3 = originalColor
-        }):Play()
-
-        task.delay(0.3, function()
-            for _, ui in ipairs(contentToToggle) do ui.Visible = true end
-            if specialImage then
-                specialImage.Image = originalImage
-                specialImage.Size = UDim2.new(0, 316, 0, 128)
-                specialImage.Position = UDim2.new(0, 0, 0, 0)
-                specialImage:FindFirstChildOfClass("UICorner").CornerRadius = originalCorner or UDim.new(0, 4)
+        if minimized then
+            -- Hide content
+            for _, ui in ipairs(contentToToggle) do
+                ui.Visible = false
             end
-        end)
-    end
+            if specialImage then
+                specialImage.Visible = false
+            end
 
-    button.MouseButton1Click:Connect(minimize)
-    restoreButton.MouseButton1Click:Connect(maximize)
+            -- Animate frame smaller and change color
+            local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+            local tween = tweenService:Create(main, tweenInfo, {
+                Size = UDim2.new(0, 120, 0, 30),
+                BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+            })
+            tween:Play()
+
+        else
+            -- Animate back to full size and change color
+            local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+            local tween = tweenService:Create(main, tweenInfo, {
+                Size = UDim2.new(0, 316, 0, 128),
+                BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+            })
+            tween:Play()
+
+            tween.Completed:Connect(function()
+                -- Restore content after animation
+                for _, ui in ipairs(contentToToggle) do
+                    ui.Visible = true
+                end
+                if specialImage then
+                    specialImage.Visible = true
+                end
+            end)
+        end
+    end)
 end
-
 task.spawn(C_14)
 local function C_18()
     local script = G2L["18"]
@@ -1076,6 +1009,14 @@ local letters = {
     local keepTextCheckbox = script.Parent.Parent.Parent:FindFirstChild("KeepTextCheckbox")
     local keepTextTick = keepTextCheckbox and keepTextCheckbox:FindFirstChild("Tick")
 
+    -- Add special character only if checkbox is checked (tick is visible)
+    if keepTextTick and keepTextTick.TextTransparency == 0 then
+        local specialChars = {"★", "☠", "✿", "❖", "♡", "♬", "✓", "☾", "⚔", "⛧", "☢", "☯", "⚠", "♛", "⚡"}
+        local startChar = specialChars[math.random(1, #specialChars)]
+        local endChar = specialChars[math.random(1, #specialChars)]
+        msg = startChar .. msg .. endChar
+    end
+
     if tagged then
         showNotification("HELL NAH !!", "TEXT FUCKED")
         textBox.Text = ""
@@ -1085,7 +1026,7 @@ local letters = {
         else
             chat:SendAsync(msg)
         end
-        
+
         -- ONLY clear if checkbox is NOT checked
         if keepTextTick and keepTextTick.TextTransparency == 1 then
             textBox.Text = ""
