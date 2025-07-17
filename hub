@@ -1,6 +1,3 @@
-
-
-
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
 local Lighting = game:GetService("Lighting")
@@ -546,8 +543,61 @@ local function C_14()
     local button = script.Parent
     local minimized = false
     local tweenService = game:GetService("TweenService")
+    local runService = game:GetService("RunService")
 
-    -- Find the special ImageLabel
+    -- === CONFIG (change these IDs to yours) ===
+    local divineImageId = "rbxassetid://105086894272111" -- 🌟 Divine effect image (change this)
+    local minimizedIconId = "rbxassetid://84935017672596" -- 🌀 Minimized square icon (change this)
+    local clickSoundId = "rbxassetid://7227567562" -- 🔊 Click sound effect (change this)
+    -- ==========================================
+
+    -- Create Sound
+    local sound = Instance.new("Sound", button)
+    sound.SoundId = clickSoundId
+    sound.Volume = 1
+
+    -- Create Divine Effect
+    local divineImage = Instance.new("ImageLabel")
+    divineImage.Size = UDim2.new(0, 60, 0, 60)
+    divineImage.Position = UDim2.new(0.5, -30, 0.5, -30)
+    divineImage.Image = divineImageId
+    divineImage.BackgroundTransparency = 1
+    divineImage.Visible = false
+    divineImage.ZIndex = 0
+    divineImage.Name = "DivineEffect"
+    divineImage.Parent = main
+
+    local divineCorner = Instance.new("UICorner")
+    divineCorner.CornerRadius = UDim.new(1, 0)
+    divineCorner.Parent = divineImage
+
+    -- Rotation logic
+    local rotationConnection
+    local function startRotation()
+        rotationConnection = runService.RenderStepped:Connect(function()
+            divineImage.Rotation = (divineImage.Rotation + 1) % 360
+        end)
+    end
+    local function stopRotation()
+        if rotationConnection then rotationConnection:Disconnect() end
+    end
+
+    -- Pop animation
+    local function playPopAnimation(ui)
+        local originalSize = ui.Size
+        local pop = tweenService:Create(ui, TweenInfo.new(0.15, Enum.EasingStyle.Back), {
+            Size = originalSize + UDim2.new(0, 5, 0, 5)
+        })
+        local shrink = tweenService:Create(ui, TweenInfo.new(0.15, Enum.EasingStyle.Back), {
+            Size = originalSize
+        })
+        pop:Play()
+        pop.Completed:Connect(function()
+            shrink:Play()
+        end)
+    end
+
+    -- Find special image
     local specialImage
     for _, child in ipairs(main:GetDescendants()) do
         if child:IsA("ImageLabel") and child.Image == "rbxassetid://106628123920796" then
@@ -556,7 +606,6 @@ local function C_14()
         end
     end
 
-    -- Gather all UI elements to hide (except button and frame)
     local contentToToggle = {}
     for _, child in ipairs(main:GetDescendants()) do
         if (child:IsA("TextBox") or child:IsA("TextButton") or child:IsA("TextLabel")) and child ~= button then
@@ -564,50 +613,49 @@ local function C_14()
         end
     end
 
-    -- Save original background color
+    local originalSize = main.Size
     local originalColor = main.BackgroundColor3
+    local originalImage = specialImage and specialImage.Image
 
     button.MouseButton1Click:Connect(function()
         minimized = not minimized
+        sound:Play()
+        playPopAnimation(button)
 
         if minimized then
-            -- Hide content
-            for _, ui in ipairs(contentToToggle) do
-                ui.Visible = false
-            end
+            for _, ui in ipairs(contentToToggle) do ui.Visible = false end
             if specialImage then
-                specialImage.Visible = false
+                specialImage.Image = minimizedIconId
+                specialImage.Visible = true
             end
-
-            -- Animate frame smaller and change color
-            local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-            local tween = tweenService:Create(main, tweenInfo, {
-                Size = UDim2.new(0, 120, 0, 30),
+            local tween = tweenService:Create(main, TweenInfo.new(0.3, Enum.EasingStyle.Sine), {
+                Size = UDim2.new(0, 60, 0, 60),
                 BackgroundColor3 = Color3.fromRGB(0, 0, 0)
             })
             tween:Play()
+            divineImage.Visible = true
+            startRotation()
 
         else
-            -- Animate back to full size and change color
-            local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-            local tween = tweenService:Create(main, tweenInfo, {
-                Size = UDim2.new(0, 316, 0, 128),
-                BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+            local tween = tweenService:Create(main, TweenInfo.new(0.3, Enum.EasingStyle.Sine), {
+                Size = originalSize,
+                BackgroundColor3 = originalColor
             })
             tween:Play()
 
             tween.Completed:Connect(function()
-                -- Restore content after animation
-                for _, ui in ipairs(contentToToggle) do
-                    ui.Visible = true
-                end
+                for _, ui in ipairs(contentToToggle) do ui.Visible = true end
                 if specialImage then
-                    specialImage.Visible = true
+                    specialImage.Image = originalImage
                 end
             end)
+
+            stopRotation()
+            divineImage.Visible = false
         end
     end)
 end
+
 task.spawn(C_14)
 local function C_18()
     local script = G2L["18"]
