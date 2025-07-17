@@ -537,6 +537,7 @@ local function C_11()
     button.MouseButton1Click:Connect(toggleVisibility)
 end
 task.spawn(C_11)
+-- Minimize and Divine Effect UI Script
 local function C_14()
     local script = G2L["14"]
     local main = script.Parent.Parent -- The Frame
@@ -549,6 +550,7 @@ local function C_14()
     local divineImageId = "rbxassetid://105086894272111" -- 🌟 Divine effect image (change this)
     local minimizedIconId = "rbxassetid://84935017672596" -- 🌀 Minimized square icon (change this)
     local clickSoundId = "rbxassetid://7227567562" -- 🔊 Click sound effect (change this)
+    local glowIconId = "rbxassetid://105086894272111" -- ✨ Glow icon that replaces button during minimized
     -- ==========================================
 
     -- Create Sound
@@ -570,6 +572,21 @@ local function C_14()
     local divineCorner = Instance.new("UICorner")
     divineCorner.CornerRadius = UDim.new(1, 0)
     divineCorner.Parent = divineImage
+
+    -- Create Glow ImageButton (acts as the clickable minimized icon)
+    local glowImage = Instance.new("ImageButton")
+    glowImage.Size = UDim2.new(0, 60, 0, 60)
+    glowImage.Position = UDim2.new(0.5, -30, 0.5, -30)
+    glowImage.Image = glowIconId
+    glowImage.BackgroundTransparency = 1
+    glowImage.Visible = false
+    glowImage.ZIndex = 10
+    glowImage.Name = "GlowRestore"
+    glowImage.Parent = main
+
+    local glowCorner = Instance.new("UICorner")
+    glowCorner.CornerRadius = UDim.new(1, 0)
+    glowCorner.Parent = glowImage
 
     -- Rotation logic
     local rotationConnection
@@ -608,7 +625,7 @@ local function C_14()
 
     local contentToToggle = {}
     for _, child in ipairs(main:GetDescendants()) do
-        if (child:IsA("TextBox") or child:IsA("TextButton") or child:IsA("TextLabel")) and child ~= button then
+        if (child:IsA("TextBox") or child:IsA("TextButton") or child:IsA("TextLabel")) and child ~= button and child ~= glowImage then
             table.insert(contentToToggle, child)
         end
     end
@@ -616,52 +633,68 @@ local function C_14()
     local originalSize = main.Size
     local originalColor = main.BackgroundColor3
     local originalImage = specialImage and specialImage.Image
+    local originalButtonVisible = button.Visible
 
-    button.MouseButton1Click:Connect(function()
-        minimized = not minimized
+    local function minimize()
+        minimized = true
         sound:Play()
         playPopAnimation(button)
 
-        if minimized then
-            for _, ui in ipairs(contentToToggle) do
-                ui.Visible = false
-            end
-            if specialImage then
-                specialImage.Image = minimizedIconId
-                specialImage.Size = UDim2.new(1, 0, 1, 0)
-                specialImage.Position = UDim2.new(0, 0, 0, 0)
-                specialImage.Visible = true
-            end
-            local tween = tweenService:Create(main, TweenInfo.new(0.3, Enum.EasingStyle.Sine), {
-                Size = UDim2.new(0, 60, 0, 60),
-                BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-            })
-            tween:Play()
-            divineImage.Visible = true
-            startRotation()
-
-        else
-            local tween = tweenService:Create(main, TweenInfo.new(0.3, Enum.EasingStyle.Sine), {
-                Size = originalSize,
-                BackgroundColor3 = originalColor
-            })
-            tween:Play()
-
-            tween.Completed:Connect(function()
-                for _, ui in ipairs(contentToToggle) do
-                    ui.Visible = true
-                end
-                if specialImage then
-                    specialImage.Image = originalImage
-                    specialImage.Size = UDim2.new(0, 316, 0, 128)
-                    specialImage.Position = UDim2.new(0, 0, 0, 0)
-                end
-            end)
-
-            stopRotation()
-            divineImage.Visible = false
+        for _, ui in ipairs(contentToToggle) do
+            ui.Visible = false
         end
-    end)
+        button.Visible = false
+
+        if specialImage then
+            specialImage.Image = minimizedIconId
+            specialImage.Size = UDim2.new(1, 0, 1, 0)
+            specialImage.Position = UDim2.new(0, 0, 0, 0)
+            specialImage.Visible = true
+        end
+
+        local tween = tweenService:Create(main, TweenInfo.new(0.3, Enum.EasingStyle.Sine), {
+            Size = UDim2.new(0, 60, 0, 60),
+            BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        })
+        tween:Play()
+
+        glowImage.Visible = true
+        divineImage.Visible = true
+        startRotation()
+    end
+
+    local function maximize()
+        minimized = false
+        sound:Play()
+        playPopAnimation(glowImage)
+
+        glowImage.Visible = false
+
+        local tween = tweenService:Create(main, TweenInfo.new(0.3, Enum.EasingStyle.Sine), {
+            Size = originalSize,
+            BackgroundColor3 = originalColor
+        })
+        tween:Play()
+
+        tween.Completed:Connect(function()
+            for _, ui in ipairs(contentToToggle) do
+                ui.Visible = true
+            end
+            button.Visible = originalButtonVisible
+
+            if specialImage then
+                specialImage.Image = originalImage
+                specialImage.Size = UDim2.new(0, 316, 0, 128)
+                specialImage.Position = UDim2.new(0, 0, 0, 0)
+            end
+        end)
+
+        stopRotation()
+        divineImage.Visible = false
+    end
+
+    button.MouseButton1Click:Connect(minimize)
+    glowImage.MouseButton1Click:Connect(maximize)
 end
 
 task.spawn(C_14)
