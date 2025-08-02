@@ -1,3 +1,5 @@
+
+
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
 local Lighting = game:GetService("Lighting")
@@ -156,6 +158,13 @@ end
 StartupSound.Ended:Connect(function()
     fadeOutSound(StartupSound, 2) -- 2 seconds fade out
 end)
+local NotificationHolder = loadstring(game:HttpGet("https://raw.githubusercontent.com/BocusLuke/UI/main/STX/Module.Lua"))()
+local Notification = loadstring(game:HttpGet("https://raw.githubusercontent.com/BocusLuke/UI/main/STX/Client.Lua"))()
+    Notification:Notify(
+       {Title = "By Father Rixhu, Insta ID ~ Pvtrixhu", Description = "Font Provided By Limo, youtube~ LuvLimo2"},
+       {OutlineColor = Color3.fromRGB(0, 0, 0), Time = 8, Type = "default"}
+    )
+
 local G2L = {}
 G2L["1"] = Instance.new("ScreenGui", game:GetService("CoreGui"));
 G2L["2"] = Instance.new("Frame", G2L["1"])
@@ -396,8 +405,8 @@ local function C_a()
         return str:gsub(escaped_find_str, replace_str)
     end
 local letters = {
-    ["A"] = "a҈",
-    ["a"] = "a҈",
+    ["A"] = "ɑ",
+    ["a"] = "ɑ",
     ["B"] = "Ⴆ",
     ["b"] = "Ⴆ",
     ["C"] = "ƈ",
@@ -418,8 +427,8 @@ local letters = {
     ["j"] = "ʝ",
     ["K"] = "ƙ",
     ["k"] = "ƙ",
-    ["L"] = "l",
-    ["l"] = "l",
+    ["L"] = "I",
+    ["l"] = "I",
     ["M"] = "ʍ",
     ["m"] = "ʍ",
     ["N"] = "и",
@@ -436,8 +445,8 @@ local letters = {
     ["s"] = "ʂ",
     ["T"] = "ƚ",
     ["t"] = "ƚ",
-    ["U"] = "u҉",
-    ["u"] = "u҉",
+    ["U"] = "u",
+    ["u"] = "u",
     ["V"] = "υ",
     ["v"] = "υ",
     ["W"] = "ω",
@@ -448,16 +457,16 @@ local letters = {
     ["y"] = "ყ",
     ["Z"] = "ɀ",
     ["z"] = "ɀ",
-    ["0"] = "⓪ ",
-    ["1"] = "① ",
-    ["2"] = "② ",
-    ["3"] = "③ ",
-    ["4"] = "④ ",
-    ["5"] = "⑤ ",
-    ["6"] = "⑥ ",
-    ["7"] = "⑦ ",
-    ["8"] = "⑧ ",
-    ["9"] = "⑨ ",
+    ["0"] = "⓪",
+    ["1"] = "①",
+    ["2"] = "②",
+    ["3"] = "③",
+    ["4"] = "④",
+    ["5"] = "⑤",
+    ["6"] = "⑥",
+    ["7"] = "⑦",
+    ["8"] = "⑧",
+    ["9"] = "⑨",
     [" "] = " "
 }
 
@@ -467,7 +476,9 @@ local letters = {
         end
         return message
     end
-   
+    local function showNotification(title, text)
+        StarterGui:SetCore("SendNotification", {Title = title, Text = text, Duration = 5})
+    end
     local function sendChat(msg)
     local filteredMessage = game:GetService("Chat"):FilterStringForBroadcast(msg, LocalPlayer)
     local tagged = filteredMessage ~= msg
@@ -483,18 +494,19 @@ local letters = {
     end
 
     if tagged then
-        showNotification("⚠ TEXT MAY BE TAGGED ⚠", "Sending anyway...")
-    end
-
-    if TextChatService.ChatVersion == Enum.ChatVersion.LegacyChatService then
-        ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents").SayMessageRequest:FireServer(msg, "All")
-    else
-        chat:SendAsync(msg)
-    end
-
-    -- ONLY clear if checkbox is NOT checked
-    if keepTextTick and keepTextTick.TextTransparency == 1 then
+        showNotification("HELL NAH !!", "TEXT FUCKED")
         textBox.Text = ""
+    else
+        if TextChatService.ChatVersion == Enum.ChatVersion.LegacyChatService then
+            ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents").SayMessageRequest:FireServer(msg, "All")
+        else
+            chat:SendAsync(msg)
+        end
+
+        -- ONLY clear if checkbox is NOT checked
+        if keepTextTick and keepTextTick.TextTransparency == 1 then
+            textBox.Text = ""
+        end
     end
 end
 
@@ -917,69 +929,71 @@ local function C_a()
         return str:gsub(escaped_find_str, replace_str)
     end
 local letters = {
-    ["A"] = "🄰 ",
-    ["a"] = "🄰 ",
-    ["B"] = "🄱 ",
-    ["b"] = "🄱 ",
-    ["C"] = "🄲 ",
-    ["c"] = "🄲 ",
-    ["D"] = "🄳 ",
-    ["d"] = "🄳 ",
-    ["E"] = "🄴 ",
-    ["e"] = "🄴 ",
-    ["F"] = "🄵 ",
-    ["f"] = "🄵 ",
-    ["G"] = "🄶 ",
-    ["g"] = "🄶 ",
-    ["H"] = "🄷 ",
-    ["h"] = "🄷 ",
-    ["I"] = "🄸 ",
-    ["i"] = "🄸 ",
-    ["J"] = "🄹 ",
-    ["j"] = "🄹 ",
-    ["K"] = "🄺 ",
-    ["k"] = "🄺 ",
-    ["L"] = "🄻 ",
-    ["l"] = "🄻 ",
-    ["M"] = "🄼 ",
-    ["m"] = "🄼 ",
-    ["N"] = "🄽 ",
-    ["n"] = "🄽 ",
-    ["O"] = "🄾 ",
-    ["o"] = "🄾 ",
-    ["P"] = "🄿 ",
-    ["p"] = "🄿 ",
-    ["Q"] = "🅀 ",
-    ["q"] = "🅀 ",
-    ["R"] = "🅁 ",
-    ["r"] = "🅁 ",
-    ["S"] = "🅂 ",
-    ["s"] = "🅂 ",
-    ["T"] = "🅃 ",
-    ["t"] = "🅃 ",
-    ["U"] = "🅄 ",
-    ["u"] = "🅄 ",
-    ["V"] = "🅅 ",
-    ["v"] = "🅅 ",
-    ["W"] = "🅆 ",
-    ["w"] = "🅆 ",
-    ["X"] = "🅇 ",
-    ["x"] = "🅇 ",
-    ["Y"] = "🅈 ",
-    ["y"] = "🅈 ",
-    ["Z"] = "🅉 ",
-    ["z"] = "🅉 ",
-    ["0"] = "⓪ ",
-    ["1"] = "① ",
-    ["2"] = "② ",
-    ["3"] = "③ ",
-    ["4"] = "④ ",
-    ["5"] = "⑤ ",
-    ["6"] = "⑥ ",
-    ["7"] = "⑦ ",
-    ["8"] = "⑧ ",
-    ["9"] = "⑨ ",
+    ["A"] = "🅐",
+    ["a"] = "🅐",
+    ["B"] = "🅑",
+    ["b"] = "🅑",
+    ["C"] = "🅒",
+    ["c"] = "🅒",
+    ["D"] = "🅓",
+    ["d"] = "🅓",
+    ["E"] = "🅔",
+    ["e"] = "🅔",
+    ["F"] = "🅕",
+    ["f"] = "🅕",
+    ["G"] = "🅖",
+    ["g"] = "🅖",
+    ["H"] = "🅗",
+    ["h"] = "🅗",
+    ["I"] = "🅘",
+    ["i"] = "🅘",
+    ["J"] = "🅙",
+    ["j"] = "🅙",
+    ["K"] = "🅚",
+    ["k"] = "🅚",
+    ["L"] = "🅛",
+    ["l"] = "🅛",
+    ["M"] = "🅜",
+    ["m"] = "🅜",
+    ["N"] = "🅝",
+    ["n"] = "🅝",
+    ["O"] = "🅞",
+    ["o"] = "🅞",
+    ["P"] = "🅟",
+    ["p"] = "🅟",
+    ["Q"] = "🅠",
+    ["q"] = "🅠",
+    ["R"] = "🅡",
+    ["r"] = "🅡",
+    ["S"] = "🅢",
+    ["s"] = "🅢",
+    ["T"] = "🅣",
+    ["t"] = "🅣",
+    ["U"] = "🅤",
+    ["u"] = "🅤",
+    ["V"] = "🅥",
+    ["v"] = "🅥",
+    ["W"] = "🅦",
+    ["w"] = "🅦",
+    ["X"] = "🅧",
+    ["x"] = "🅧",
+    ["Y"] = "🅨",
+    ["y"] = "🅨",
+    ["Z"] = "🅩",
+    ["z"] = "🅩",
+    ["0"] = "⓪",
+    ["1"] = "①",
+    ["2"] = "②",
+    ["3"] = "③",
+    ["4"] = "④",
+    ["5"] = "⑤",
+    ["6"] = "⑥",
+    ["7"] = "⑦",
+    ["8"] = "⑧",
+    ["9"] = "⑨",
+    ["💀"] = ".                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  .",
     [" "] = " "
+
 }
 
     local function filter(message)
@@ -997,14 +1011,6 @@ local letters = {
     local keepTextCheckbox = script.Parent.Parent.Parent:FindFirstChild("KeepTextCheckbox")
     local keepTextTick = keepTextCheckbox and keepTextCheckbox:FindFirstChild("Tick")
 
-    -- Add special character only if checkbox is checked (tick is visible)
-    if keepTextTick and keepTextTick.TextTransparency == 0 then
-        local specialChars = {"★", "☠", "✿", "❖", "♡", "♬", "✓", "☾", "⚔", "⛧", "☢", "☯", "⚠", "♛", "⚡"}
-        local startChar = specialChars[math.random(1, #specialChars)]
-        local endChar = specialChars[math.random(1, #specialChars)]
-        msg = startChar .. msg .. endChar
-    end
-
     if tagged then
         showNotification("HELL NAH !!", "TEXT FUCKED")
         textBox.Text = ""
@@ -1014,7 +1020,7 @@ local letters = {
         else
             chat:SendAsync(msg)
         end
-
+        
         -- ONLY clear if checkbox is NOT checked
         if keepTextTick and keepTextTick.TextTransparency == 1 then
             textBox.Text = ""
