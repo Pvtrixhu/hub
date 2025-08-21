@@ -421,8 +421,8 @@ local letters = {
     ["g"] = "ɠ҈",
     ["H"] = "ꜧ҈",
     ["h"] = "ꜧ҈",
-    ["I"] = "i҈",
-    ["i"] = "i҈",
+    ["I"] = "ι҈",
+    ["i"] = "ι҈",
     ["J"] = "ʝ҈",
     ["j"] = "ʝ҈",
     ["K"] = "ƙ҈",
@@ -467,10 +467,7 @@ local letters = {
     ["7"] = "⑦ˌ",
     ["8"] = "⑧ˌ",
     ["9"] = "⑨ˌ",
-    ["🔧"] = "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
-",
     [" "] = " "
-
 }
 
     local function filter(message)
@@ -1014,14 +1011,6 @@ local letters = {
     local keepTextCheckbox = script.Parent.Parent.Parent:FindFirstChild("KeepTextCheckbox")
     local keepTextTick = keepTextCheckbox and keepTextCheckbox:FindFirstChild("Tick")
 
-    -- Add special character only if checkbox is checked (tick is visible)
-    if keepTextTick and keepTextTick.TextTransparency == 0 then
-        local specialChars = {"★", "☠", "✿", "❖", "♡", "♬", "✓", "☾", "⚔", "⛧", "☢", "☯", "⚠", "♛", "⚡"}
-        local startChar = specialChars[math.random(1, #specialChars)]
-        local endChar = specialChars[math.random(1, #specialChars)]
-        msg = startChar .. msg .. endChar
-    end
-
     if tagged then
         showNotification("HELL NAH !!", "TEXT FUCKED")
         textBox.Text = ""
@@ -1031,7 +1020,7 @@ local letters = {
         else
             chat:SendAsync(msg)
         end
-
+        
         -- ONLY clear if checkbox is NOT checked
         if keepTextTick and keepTextTick.TextTransparency == 1 then
             textBox.Text = ""
