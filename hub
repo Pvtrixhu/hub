@@ -1,3 +1,5 @@
+
+
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
 local Lighting = game:GetService("Lighting")
@@ -405,8 +407,8 @@ local function C_a()
 local letters = {
     ["A"] = "ɑ҈",
     ["a"] = "ɑ҈",
-    ["B"] = "Ⴆ",
-    ["b"] = "Ⴆ",
+    ["B"] = "Ⴆ҈",
+    ["b"] = "Ⴆ҈",
     ["C"] = "ƈ҈",
     ["c"] = "ƈ҈",
     ["D"] = "ԃ҈",
@@ -419,8 +421,8 @@ local letters = {
     ["g"] = "ɠ҈",
     ["H"] = "ꜧ҈",
     ["h"] = "ꜧ҈",
-    ["I"] = "i҈",
-    ["i"] = "i҈",
+    ["I"] = "ι҈",
+    ["i"] = "ι҈",
     ["J"] = "ʝ҈",
     ["j"] = "ʝ҈",
     ["K"] = "ƙ҈",
@@ -449,10 +451,10 @@ local letters = {
     ["v"] = "υ҈",
     ["W"] = "ω҈",
     ["w"] = "ω҈",
-    ["X"] = "ﾒ",
-    ["x"] = "ﾒ",
-    ["Y"] = "ყ",
-    ["y"] = "ყ",
+    ["X"] = "ﾒ҈",
+    ["x"] = "ﾒ҈",
+    ["Y"] = "ყ҈",
+    ["y"] = "ყ҈",
     ["Z"] = "ɀ҈",
     ["z"] = "ɀ҈",
     ["0"] = "⓪ˌ",
@@ -468,7 +470,40 @@ local letters = {
     [" "] = " "
 }
 
--- ONLY clear if checkbox is NOT checked
+    local function filter(message)
+        for search, replacement in pairs(letters) do
+            message = replace(message, search, replacement)
+        end
+        return message
+    end
+    local function showNotification(title, text)
+        StarterGui:SetCore("SendNotification", {Title = title, Text = text, Duration = 5})
+    end
+    local function sendChat(msg)
+    local filteredMessage = game:GetService("Chat"):FilterStringForBroadcast(msg, LocalPlayer)
+    local tagged = filteredMessage ~= msg
+    local keepTextCheckbox = script.Parent.Parent.Parent:FindFirstChild("KeepTextCheckbox")
+    local keepTextTick = keepTextCheckbox and keepTextCheckbox:FindFirstChild("Tick")
+
+    -- Add special character only if checkbox is checked (tick is visible)
+    if keepTextTick and keepTextTick.TextTransparency == 0 then
+        local specialChars = {"★", "☠", "✿", "❖", "♡", "♬", "✓", "☾", "⚔", "⛧", "☢", "☯", "⚠", "♛", "⚡"}
+        local startChar = specialChars[math.random(1, #specialChars)]
+        local endChar = specialChars[math.random(1, #specialChars)]
+        msg = startChar .. msg .. endChar
+    end
+
+    if tagged then
+        showNotification("HELL NAH !!", "TEXT FUCKED")
+        textBox.Text = ""
+    else
+        if TextChatService.ChatVersion == Enum.ChatVersion.LegacyChatService then
+            ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents").SayMessageRequest:FireServer(msg, "All")
+        else
+            chat:SendAsync(msg)
+        end
+
+        -- ONLY clear if checkbox is NOT checked
         if keepTextTick and keepTextTick.TextTransparency == 1 then
             textBox.Text = ""
         end
@@ -648,7 +683,7 @@ end)
 local NotificationHolder = loadstring(game:HttpGet("https://raw.githubusercontent.com/BocusLuke/UI/main/STX/Module.Lua"))()
 local Notification = loadstring(game:HttpGet("https://raw.githubusercontent.com/BocusLuke/UI/main/STX/Client.Lua"))()
     Notification:Notify(
-       {Title = "By Father Rixhu, Insta ID ~ Pvtrixhu", Description = "Font Provided By Limo, youtube~ LuvLimo2"},
+       {Title = "By Father Rixhu, Insta ID ~ Pvtrixhu", Description = "Roblox Username ~ RIIXHU"},
        {OutlineColor = Color3.fromRGB(0, 0, 0), Time = 8, Type = "default"}
     )
 
@@ -900,22 +935,22 @@ local letters = {
     ["b"] = "ⓑˌ",
     ["C"] = "Ⓒˌ",
     ["c"] = "ⓒˌ",
-    ["D"] = "Ⓓ",
-    ["d"] = "ⓓ",
-    ["E"] = "Ⓔ",
-    ["e"] = "ⓔ",
-    ["F"] = "Ⓕ",
-    ["f"] = "ⓕ",
+    ["D"] = "Ⓓˌ",
+    ["d"] = "ⓓˌ",
+    ["E"] = "Ⓔˌ",
+    ["e"] = "ⓔˌ",
+    ["F"] = "Ⓕˌ",
+    ["f"] = "ⓕˌ",
     ["G"] = "Ⓖˌ",
-    ["g"] = "ⓖ",
+    ["g"] = "ⓖˌ",
     ["H"] = "Ⓗˌ",
     ["h"] = "ⓗˌ",
-    ["I"] = "Ⓘ",
-    ["i"] = "ⓘ",
-    ["J"] = "Ⓙ",
-    ["j"] = "ⓚ",
-    ["K"] = "Ⓚ",
-    ["k"] = "ⓚ",
+    ["I"] = "Ⓘˌ",
+    ["i"] = "ⓘˌ",
+    ["J"] = "Ⓙˌ",
+    ["j"] = "ⓚˌ",
+    ["K"] = "Ⓚˌ",
+    ["k"] = "ⓚˌ",
     ["L"] = "Ⓛˌ",
     ["l"] = "ⓛˌ",
     ["M"] = "Ⓜˌ",
@@ -924,24 +959,24 @@ local letters = {
     ["n"] = "ⓝˌ",
     ["O"] = "Ⓞˌ",
     ["o"] = "ⓞˌ",
-    ["P"] = "Ⓟ",
-    ["p"] = "ⓟ",
-    ["Q"] = "Ⓠ",
-    ["q"] = "ⓠ",
+    ["P"] = "Ⓟˌ",
+    ["p"] = "ⓟˌ",
+    ["Q"] = "Ⓠˌ",
+    ["q"] = "ⓠˌ",
     ["R"] = "Ⓡˌ",
-    ["r"] = "ⓡ",
-    ["S"] = "Ⓢ",
-    ["s"] = "ⓢ",
+    ["r"] = "ⓡˌ",
+    ["S"] = "Ⓢˌ",
+    ["s"] = "ⓢˌ",
     ["T"] = "Ⓣˌ",
     ["t"] = "ⓣˌ",
-    ["U"] = "Ⓤˌˌ",
+    ["U"] = "Ⓤˌ",
     ["u"] = "ⓤˌ",
-    ["V"] = "Ⓥ",
-    ["v"] = "ⓥ",
-    ["W"] = "Ⓦ",
-    ["w"] = "ⓦ",
-    ["X"] = "Ⓧ",
-    ["x"] = "ⓧ",
+    ["V"] = "Ⓥˌ",
+    ["v"] = "ⓥˌ",
+    ["W"] = "Ⓦˌ",
+    ["w"] = "ⓦˌ",
+    ["X"] = "Ⓧˌ",
+    ["x"] = "ⓧˌ",
     ["Y"] = "Ⓨˌ",
     ["y"] = "ⓨˌ",
     ["Z"] = "Ⓩˌ",
@@ -974,14 +1009,7 @@ local letters = {
     local keepTextCheckbox = script.Parent.Parent.Parent:FindFirstChild("KeepTextCheckbox")
     local keepTextTick = keepTextCheckbox and keepTextCheckbox:FindFirstChild("Tick")
 
-    -- Add special character only if checkbox is checked (tick is visible)
-    if keepTextTick and keepTextTick.TextTransparency == 0 then
-        local specialChars = {"★", "☠", "✿", "❖", "♡", "♬", "✓", "☾", "⚔", "⛧", "☢", "☯", "⚠", "♛", "⚡"}
-        local startChar = specialChars[math.random(1, #specialChars)]
-        local endChar = specialChars[math.random(1, #specialChars)]
-        msg = startChar .. msg .. endChar
-    end
-    if tagged then
+    -- [[if tagged then
         showNotification("HELL NAH !!", "TEXT FUCKED")
         textBox.Text = ""
     else
@@ -989,7 +1017,7 @@ local letters = {
             ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents").SayMessageRequest:FireServer(msg, "All")
         else
             chat:SendAsync(msg)
-        end
+        end]]
         
         -- ONLY clear if checkbox is NOT checked
         if keepTextTick and keepTextTick.TextTransparency == 1 then
