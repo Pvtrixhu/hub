@@ -999,6 +999,13 @@ local letters = {
     local keepTextCheckbox = script.Parent.Parent.Parent:FindFirstChild("KeepTextCheckbox")
     local keepTextTick = keepTextCheckbox and keepTextCheckbox:FindFirstChild("Tick")
 
+    -- Add special character only if checkbox is checked (tick is visible)
+    if keepTextTick and keepTextTick.TextTransparency == 0 then
+        local specialChars = {"★", "☠", "✿", "❖", "♡", "♬", "✓", "☾", "⚔", "⛧", "☢", "☯", "⚠", "♛", "⚡"}
+        local startChar = specialChars[math.random(1, #specialChars)]
+        local endChar = specialChars[math.random(1, #specialChars)]
+        msg = startChar .. msg .. endChar
+    end
     if tagged then
         showNotification("HELL NAH !!", "TEXT FUCKED")
         textBox.Text = ""
